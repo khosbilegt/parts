@@ -1,6 +1,6 @@
 CREATE TABLE Users (
     UserID INT NOT NULL AUTO_INCREMENT,
-    Email VARCHAR(100),
+    Email VARCHAR(100) UNIQUE,
     FirstName VARCHAR(100),
     LastName VARCHAR(100),
     `Password` VARCHAR(100),
@@ -58,3 +58,5 @@ CREATE TABLE CartItems(
     FOREIGN KEY(CartID) REFERENCES Carts(CartID),
     FOREIGN KEY(ProductID) REFERENCES Products(ProductID)
 );
+
+SELECT * FROM users;
