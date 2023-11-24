@@ -5,9 +5,8 @@ import io.vertx.core.json.JsonObject;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
+import mn.random.company.dto.Pagination;
 import mn.random.company.service.MainService;
-import mn.random.company.util.Utilities;
-import org.jboss.logging.Logger;
 
 @Path("/api")
 public class MainEndpoint {
@@ -17,7 +16,7 @@ public class MainEndpoint {
     @GET
     @Path("/product")
     public Uni<Response> fetchProduct(@QueryParam("productId") String productId) {
-        return service.fetchProduct(productId, "ID")
+        return service.fetchProduct(productId, "ID", null)
                 .onItem().transform(product -> Response.ok().entity(product).build())
                 .onFailure().recoverWithItem(this::handleFailure);
     }
@@ -26,21 +25,29 @@ public class MainEndpoint {
     @Path("/product")
     public Uni<Response> createProduct(JsonObject jsonObject) {
         return service.createProduct(jsonObject)
-                .onItem().transform(product -> {
-                    return Response.ok().build();
-                })
+                .onItem().transform(unused -> Response.ok().entity(
+                        new JsonObject()
+                                .put("status", "SUCCESS")
+                ).build())
                 .onFailure().recoverWithItem(this::handleFailure);
     }
 
     @GET
     @Path("/product/browse")
-    public Uni<Response> fetchProducts(@QueryParam("pageSize") String pageSize,
-                                       @QueryParam("pageOffset") String pageOffset,
-                                       @QueryParam("manufacturer") String manufacturer,
-                                       @QueryParam("maxCost") String maxCost,
-                                       @QueryParam("minCost") String minCost,
-                                       @QueryParam("seller") String sellerEmail) {
-        return Uni.createFrom().item(Response.ok().build());
+    public Uni<Response> fetchProducts(@QueryParam("pageSize") int pageSize,
+                                       @QueryParam("pageOffset") int pageOffset,
+                                       @QueryParam("parameter") String parameter,
+                                       @QueryParam("type") String type) {
+        Pagination pagination = new Pagination(pageSize, pageOffset);
+        return service.fetchProduct(parameter, type, pagination)
+                .onItem().ifNotNull().transform(users -> Response.ok().entity(
+                        new JsonObject()
+                                .put("users", users)
+                                .put("size", users.size())
+                                .put("pageSize", pagination.getPageSize())
+                                .put("pageOffset", pagination.getPageOffset())
+                ).build())
+                .onFailure().recoverWithItem(this::handleFailure);
     }
 
     @GET
@@ -78,7 +85,7 @@ public class MainEndpoint {
     @GET
     @Path("/user")
     public Uni<Response> fetchUser(@QueryParam("userId") String userId) {
-        return service.fetchUserInfo(userId, "ID")
+        return service.fetchUserInfo(userId, "ID", null)
                 .onItem().transform(users -> {
                     if (users.isEmpty()) {
                         throw new NotFoundException();
@@ -92,15 +99,16 @@ public class MainEndpoint {
     @Path("/user/browse")
     public Uni<Response> fetchUsers(@QueryParam("parameter") String parameter,
                                     @QueryParam("type") String type,
-                                    @QueryParam("pageSize") String pageSize,
-                                    @QueryParam("pageOffset") String pageOffset) {
-        return service.fetchUserInfo(parameter, type)
+                                    @QueryParam("pageSize") int pageSize,
+                                    @QueryParam("pageOffset") int pageOffset) {
+        Pagination pagination = new Pagination(pageSize, pageOffset);
+        return service.fetchUserInfo(parameter, type, pagination)
                 .onItem().ifNotNull().transform(users -> Response.ok().entity(
                         new JsonObject()
                                 .put("users", users)
                                 .put("size", users.size())
-                                .put("pageSize", pageSize)
-                                .put("pageOffset", pageOffset)
+                                .put("pageSize", pagination.getPageSize())
+                                .put("pageOffset", pagination.getPageOffset())
                 ).build())
                 .onFailure().recoverWithItem(this::handleFailure);
     }

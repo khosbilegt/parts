@@ -5,10 +5,9 @@ import io.smallrye.mutiny.Uni;
 import io.vertx.core.json.JsonObject;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import mn.random.company.dto.DataTransferObject;
+import mn.random.company.dto.Pagination;
 import mn.random.company.dto.Product;
 import mn.random.company.dto.User;
-import mn.random.company.util.Utilities;
 import org.jboss.logging.Logger;
 
 import java.sql.Connection;
@@ -77,23 +76,34 @@ public class SQLService {
         });
     }
 
-    public Uni<List<User>> fetchUsers(String parameter, Utilities.SearchType type) {
+    public Uni<List<User>> fetchUsers(String parameter, String type, Pagination pagination) {
         return Uni.createFrom().item(() -> {
             List<User> userList = new ArrayList<>();
             String query = "";
             String queryParameter = parameter;
-            switch (type) {
-                case PATTERN_SEARCH -> {
-                    query = "SELECT * FROM Users WHERE Email LIKE ?";
-                    queryParameter = "%" + parameter + "%";
+            if (type != null) {
+                switch (type.toUpperCase()) {
+                    case "EMAIL_LIKE" -> {
+                        query = "SELECT * FROM Users WHERE Email LIKE ?";
+                        queryParameter = "%" + parameter + "%";
+                    }
+                    case "ID" -> query = "SELECT * FROM Users WHERE UserId = ?";
+                    default -> query = "SELECT * FROM Users WHERE Email = ?";
                 }
-                case EMAIL -> query = "SELECT * FROM Users WHERE Email = ?";
-                case ID -> query = "SELECT * FROM Users WHERE UserId = ?";
+            } else {
+                query = "SELECT * FROM Users";
+            }
+            if (pagination != null) {
+                query += " LIMIT ? OFFSET ?";
             }
             try(Connection connection = dataSource.getConnection()) {
                 connection.setAutoCommit(false);
                 try(PreparedStatement statement = connection.prepareStatement(query)) {
                     statement.setString(1, queryParameter);
+                    if (pagination != null) {
+                        statement.setInt(2, pagination.getPageSize());
+                        statement.setInt(3, pagination.getRowOffset());
+                    }
                     try(ResultSet resultSet = statement.executeQuery()) {
                         while(resultSet.next()) {
                             userList.add(new User(
@@ -119,24 +129,54 @@ public class SQLService {
         });
     }
 
-    public Uni<List<Product>> fetchProducts(String parameter, Utilities.SearchType type) {
+    public Uni<List<Product>> fetchProducts(String parameter, String type, Pagination pagination) {
         return Uni.createFrom().item(() -> {
             List<Product> productList = new ArrayList<>();
             String query = "";
             String queryParameter = parameter;
-            switch (type) {
-                case PATTERN_SEARCH -> {
-                    query = "SELECT * FROM Products WHERE Email LIKE ?";
-                    queryParameter = "%" + parameter + "%";
+            if (type != null) {
+                switch (type.toUpperCase()) {
+                    case "NAME" -> {
+                        query = "SELECT * FROM Products WHERE Name LIKE ?";
+                        queryParameter = "%" + parameter + "%";
+                    }
+                    case "SELLER" -> query = "SELECT * FROM Products WHERE Seller = ?";
+                    case "MANUFACTURER" -> query = "SELECT * FROM Products WHERE Manufacturer = ?";
+                    case "CATEGORY" -> query = "SELECT * FROM Products WHERE Category = ?";
+                    case "PRICE" -> query = "SELECT * FROM Products WHERE Price BETWEEN ? AND ?";
+                    default -> query = "SELECT * FROM Products WHERE ProductId = ?";
                 }
-                case EMAIL -> query = "SELECT * FROM Products WHERE Email = ?";
-                case ID -> query = "SELECT * FROM Products WHERE ProductId = ?";
+            } else {
+                query = "SELECT * FROM Products";
             }
-            System.out.println(query);
+            if (pagination != null) {
+                query += " LIMIT ? OFFSET ?";
+            }
             try(Connection connection = dataSource.getConnection()) {
                 connection.setAutoCommit(false);
                 try(PreparedStatement statement = connection.prepareStatement(query)) {
-                    statement.setString(1, queryParameter);
+                    if (type != null) {
+                        if (type.equals("PRICE")) {
+                            List<String> prices = List.of(parameter.split("|"));
+                            statement.setInt(1, Integer.parseInt(prices.get(0)));
+                            statement.setInt(2, Integer.parseInt(prices.get(0)));
+                            if (pagination != null) {
+                                statement.setInt(3, pagination.getPageSize());
+                                statement.setInt(4, pagination.getRowOffset());
+                            }
+                        } else {
+                            statement.setString(1, queryParameter);
+                            if (pagination != null) {
+                                statement.setInt(2, pagination.getPageSize());
+                                statement.setInt(3, pagination.getRowOffset());
+                            }
+                        }
+                    } else {
+                        if (pagination != null) {
+                            statement.setInt(1, pagination.getPageSize());
+                            statement.setInt(2, pagination.getRowOffset());
+                        }
+                    }
                     try(ResultSet resultSet = statement.executeQuery()) {
                         while(resultSet.next()) {
                             productList.add(new Product(

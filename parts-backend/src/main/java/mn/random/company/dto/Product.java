@@ -2,7 +2,7 @@ package mn.random.company.dto;
 
 import io.vertx.core.json.JsonObject;
 
-public class Product extends DataTransferObject {
+public class Product {
     private String productID;
     private String productName;
     private String sellerID;

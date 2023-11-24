@@ -7,7 +7,6 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.NotFoundException;
 import mn.random.company.dto.User;
 import mn.random.company.exception.AuthException;
-import mn.random.company.util.Utilities;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -55,7 +54,7 @@ public class AuthService {
                     if (email == null) {
                         throw new AuthException("TOKEN_INVALID");
                     }
-                    return service.fetchUsers(email, Utilities.SearchType.EMAIL);
+                    return service.fetchUsers(email, "EMAIL", null);
                 })
                 .onItem().transform(users -> {
                     if (users.isEmpty()) {

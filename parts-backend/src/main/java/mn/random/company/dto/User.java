@@ -1,6 +1,6 @@
 package mn.random.company.dto;
 
-public class User extends DataTransferObject {
+public class User {
     private String id;
     private String email;
     private String firstName;

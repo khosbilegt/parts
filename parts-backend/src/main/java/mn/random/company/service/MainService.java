@@ -4,6 +4,7 @@ import io.smallrye.mutiny.Uni;
 import io.vertx.core.json.JsonObject;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import mn.random.company.dto.Pagination;
 import mn.random.company.dto.Product;
 import mn.random.company.dto.User;
 import mn.random.company.util.Utilities;
@@ -29,23 +30,11 @@ public class MainService {
                 .replaceWithVoid();
     }
 
-    public Uni<List<Product>> fetchProduct(String parameter, String type) {
-        Utilities.SearchType searchType;
-        try {
-            searchType = Utilities.SearchType.valueOf(type);
-        } catch (Exception e) {
-            searchType = Utilities.SearchType.ID;
-        }
-        return database.fetchProducts(parameter, searchType);
+    public Uni<List<Product>> fetchProduct(String parameter, String type, Pagination pagination) {
+        return database.fetchProducts(parameter, type, pagination);
     }
 
-    public Uni<List<User>> fetchUserInfo(String parameter, String type) {
-        Utilities.SearchType searchType;
-        try {
-            searchType = Utilities.SearchType.valueOf(type.toUpperCase());
-        } catch (Exception e) {
-            searchType = Utilities.SearchType.EMAIL;
-        }
-        return database.fetchUsers(parameter, searchType);
+    public Uni<List<User>> fetchUserInfo(String parameter, String type, Pagination pagination) {
+        return database.fetchUsers(parameter, type.toUpperCase(), pagination);
     }
 }
