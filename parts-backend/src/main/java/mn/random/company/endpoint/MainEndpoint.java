@@ -25,10 +25,16 @@ public class MainEndpoint {
     @Path("/product")
     public Uni<Response> createProduct(JsonObject jsonObject) {
         return service.createProduct(jsonObject)
-                .onItem().transform(unused -> Response.ok().entity(
-                        new JsonObject()
-                                .put("status", "SUCCESS")
-                ).build())
+                .onItem().transform(this::handleSuccess)
+                .onFailure().recoverWithItem(this::handleFailure);
+    }
+
+    @DELETE
+    @Path("/product")
+    public Uni<Response> deleteProduct(@QueryParam("token") String token,
+                                       @QueryParam("productId") String productId) {
+        return service.deleteProduct(token, productId)
+                .onItem().transform(this::handleSuccess)
                 .onFailure().recoverWithItem(this::handleFailure);
     }
 
@@ -113,6 +119,13 @@ public class MainEndpoint {
                 .onFailure().recoverWithItem(this::handleFailure);
     }
 
+
+    private Response handleSuccess(Object ignored) {
+        return Response.ok().entity(
+                        new JsonObject()
+                                .put("status", "SUCCESS")
+                ).build();
+    }
 
     private Response handleFailure(Throwable throwable) {
         if (throwable instanceof NotFoundException) {

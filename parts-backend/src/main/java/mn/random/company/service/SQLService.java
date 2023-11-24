@@ -99,10 +99,12 @@ public class SQLService {
             try(Connection connection = dataSource.getConnection()) {
                 connection.setAutoCommit(false);
                 try(PreparedStatement statement = connection.prepareStatement(query)) {
-                    statement.setString(1, queryParameter);
+                    if (type != null) {
+                        statement.setString(1, queryParameter);
+                    }
                     if (pagination != null) {
-                        statement.setInt(2, pagination.getPageSize());
-                        statement.setInt(3, pagination.getRowOffset());
+                        statement.setInt(type == null ? 1 : 2, pagination.getPageSize());
+                        statement.setInt(type == null ? 2 : 3, pagination.getRowOffset());
                     }
                     try(ResultSet resultSet = statement.executeQuery()) {
                         while(resultSet.next()) {
@@ -192,12 +194,12 @@ public class SQLService {
                         }
                     }
                 } catch (SQLException e) {
-                    LOG.errorv(e, "SQL_Exception during Fetch User (Fetch): {0}", e.getMessage());
+                    LOG.errorv(e, "SQL_Exception during Fetch Product (Fetch): {0}", e.getMessage());
                     throw new RuntimeException("FETCH_FAILED");
                 }
                 connection.commit();
             } catch (SQLException e) {
-                LOG.errorv(e, "SQL_Exception during Fetch User (Connect): {0}", e.getMessage());
+                LOG.errorv(e, "SQL_Exception during Fetch Product (Connect): {0}", e.getMessage());
                 throw new RuntimeException("FETCH_FAILED");
             }
             return productList;
@@ -227,6 +229,26 @@ public class SQLService {
             } catch (SQLException e) {
                 LOG.errorv(e, "SQL_Exception during Create Product (Connect): {0}", e.getMessage());
                 throw new RuntimeException("PRODUCT_CREATION_FAILED");
+            }
+        });
+    }
+
+    public Uni<Void> deleteProduct(String productId) {
+        return Uni.createFrom().voidItem().invoke(unused -> {
+            try(Connection connection = dataSource.getConnection()) {
+                connection.setAutoCommit(false);
+                String query = "DELETE FROM Products WHERE ProductID = ?";
+                try(PreparedStatement statement = connection.prepareStatement(query)) {
+                    statement.setString(1, productId);
+                    statement.executeUpdate();
+                } catch(SQLException e) {
+                    LOG.errorv(e, "SQL_Exception during Delete Product (Delete): {0}", e.getMessage());
+                    throw new RuntimeException("PRODUCT_DELETION_FAILED");
+                }
+                connection.commit();
+            } catch (SQLException e) {
+                LOG.errorv(e, "SQL_Exception during Create Product (Connect): {0}", e.getMessage());
+                throw new RuntimeException("PRODUCT_DELETION_FAILED");
             }
         });
     }
