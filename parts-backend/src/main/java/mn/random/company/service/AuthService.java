@@ -4,7 +4,6 @@ import io.smallrye.mutiny.Uni;
 import io.vertx.core.json.JsonObject;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.core.Response;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,11 +12,11 @@ import java.util.UUID;
 @ApplicationScoped
 public class AuthService {
     @Inject
-    SQLService sqlService;
-    private Map<String, String> TOKENS = new HashMap<>();
+    SQLService service;
+    private final Map<String, String> TOKENS = new HashMap<>();
 
     public Uni<String> register(JsonObject jsonObject) {
-        return sqlService.registerUser(jsonObject)
+        return service.registerUser(jsonObject)
                 .onItem().transform(unused -> {
                     String email = jsonObject.getString("email");
                     String token = UUID.randomUUID().toString();
@@ -27,7 +26,7 @@ public class AuthService {
     }
 
     public Uni<String> login(String email, String password) {
-        return sqlService.validateUser(email, password)
+        return service.validateUser(email, password)
                 .onItem().transform(unused -> {
                     String token = UUID.randomUUID().toString();
                     if (TOKENS.containsKey(email)) {
