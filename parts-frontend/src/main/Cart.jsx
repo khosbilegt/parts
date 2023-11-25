@@ -44,6 +44,7 @@ function Cart() {
           })
           .then(response => {
                if(response.status === 200) {
+                    console.log(response.data)
                     setCartItems(response.data)
                }
           })
@@ -68,7 +69,7 @@ function Cart() {
           </div>
           <div>
                {cartItems.map((item, index) => {
-                    return <Typography index={index}>{item.productId}</Typography>
+                    return <Typography index={index}>{item?.product?.productName}</Typography>
                })}
           </div>
     </div>
