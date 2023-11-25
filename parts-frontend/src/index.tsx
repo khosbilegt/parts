@@ -6,12 +6,13 @@ import {
   RouterProvider
 } from 'react-router-dom';
 import { Login, Register } from './auth';
+import { Home } from './main';
 
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <div>Hello world!</div>,
+    element: <Home />,
   },
   {
     path: "/login",

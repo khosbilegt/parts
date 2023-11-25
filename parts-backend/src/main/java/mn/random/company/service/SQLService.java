@@ -138,7 +138,7 @@ public class SQLService {
             if (type != null) {
                 switch (type.toUpperCase()) {
                     case "NAME" -> {
-                        query = "SELECT * FROM Products WHERE Name LIKE ?";
+                        query = "SELECT * FROM Products WHERE ProductName LIKE ?";
                         queryParameter = "%" + parameter + "%";
                     }
                     case "SELLER" -> query = "SELECT * FROM Products WHERE Seller = ?";
@@ -158,9 +158,9 @@ public class SQLService {
                 try(PreparedStatement statement = connection.prepareStatement(query)) {
                     if (type != null) {
                         if (type.equals("PRICE")) {
-                            List<String> prices = List.of(parameter.split("|"));
+                            List<String> prices = List.of(parameter.split("_"));
                             statement.setInt(1, Integer.parseInt(prices.get(0)));
-                            statement.setInt(2, Integer.parseInt(prices.get(0)));
+                            statement.setInt(2, Integer.parseInt(prices.get(1)));
                             if (pagination != null) {
                                 statement.setInt(3, pagination.getPageSize());
                                 statement.setInt(4, pagination.getRowOffset());

@@ -5,6 +5,7 @@ import io.vertx.core.json.JsonObject;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.QueryParam;
 import mn.random.company.dto.User;
 import mn.random.company.exception.AuthException;
 
@@ -17,6 +18,8 @@ public class AuthService {
     @Inject
     SQLService service;
     private final Map<String, String> TOKENS = new HashMap<>();
+
+
 
     public Uni<String> register(JsonObject jsonObject) {
         return service.registerUser(jsonObject)

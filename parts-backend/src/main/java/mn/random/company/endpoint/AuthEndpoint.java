@@ -3,8 +3,10 @@ package mn.random.company.endpoint;
 import io.smallrye.mutiny.Uni;
 import io.vertx.core.json.JsonObject;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Response;
 import mn.random.company.service.AuthService;
 
@@ -12,6 +14,16 @@ import mn.random.company.service.AuthService;
 public class AuthEndpoint {
     @Inject
     AuthService service;
+
+    @GET
+    public Uni<Response> validateToken(@QueryParam("token") String token) {
+        return service.fetchUserByToken(token)
+                .onItem().transform(unused -> Response.ok().entity(
+                        new JsonObject()
+                                .put("status", "SUCCESS")
+                ).build())
+                .onFailure().recoverWithItem(this::handleFailure);
+    }
 
     @POST
     @Path("/login")

@@ -80,7 +80,7 @@ public class MainEndpoint {
         return service.fetchProduct(parameter, type, pagination)
                 .onItem().ifNotNull().transform(users -> Response.ok().entity(
                         new JsonObject()
-                                .put("users", users)
+                                .put("products", users)
                                 .put("size", users.size())
                                 .put("pageSize", pagination.getPageSize())
                                 .put("pageOffset", pagination.getPageOffset())

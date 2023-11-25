@@ -23,7 +23,7 @@ const Login = () => {
           })
           .then(response => {
                console.log(response.data)
-               if(response.status == 200) {
+               if(response.status === 200) {
                     const token = response.data.token;
                     localStorage.setItem('parts-token', token);
                     message.success('Амжилттай нэвтэрлээ');
@@ -32,7 +32,7 @@ const Login = () => {
           })
           .catch(error => {
                setLoading(false)
-               if(error.response?.data?.message == 'EMAIL_OR_PASSWORD_INVALID') {
+               if(error.response?.data?.message === 'EMAIL_OR_PASSWORD_INVALID') {
                     message.error('Мэйл хаяг эсвэл пассворд буруу байна');
                } else {
                     message.error("Системийн алдаа гарлаа.")
