@@ -57,7 +57,23 @@ public class MainService {
         return auth.fetchUserByToken(token)
                 .onItem().transformToUni(user -> database.fetchCart(user.getId()))
                 .onItem().ifNull().failWith(new NotFoundException())
-                .onItem().ifNotNull().transformToUni(cart -> database.fetchCartItems(cart.getCartId()));
+                .onItem().ifNotNull().transformToUni(cart -> database.fetchCartItems(cart.getCartId()))
+                .onItem().transformToUni(cartItems -> {
+                    List<Uni<List<Product>>> productFetchUni = new ArrayList<>();
+                    for(CartItem item : cartItems) {
+                        productFetchUni.add(database.fetchProducts(item.getProductId(), "ID", null));
+                    }
+                    if (productFetchUni.isEmpty()) {
+                        return Uni.createFrom().item(cartItems);
+                    }
+                    return Uni.join().all(productFetchUni).andCollectFailures()
+                            .onItem().transform(products -> {
+                                for(int i = 0; i < products.size(); i++) {
+                                    cartItems.get(i).setProduct(products.get(i).get(0));
+                                }
+                                return cartItems;
+                            });
+                });
     }
 
     public Uni<Void> addToCart(String token, String productId) {

@@ -5,6 +5,7 @@ public class CartItem {
     private String cartId;
     private String productId;
     private int quantity;
+    private Product product;
 
     public CartItem(String cartItemId, String cartId, String productId, int quantity) {
         this.cartItemId = cartItemId;
@@ -43,5 +44,13 @@ public class CartItem {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
     }
 }

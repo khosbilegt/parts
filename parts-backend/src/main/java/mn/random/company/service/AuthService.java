@@ -19,8 +19,6 @@ public class AuthService {
     SQLService service;
     private final Map<String, String> TOKENS = new HashMap<>();
 
-
-
     public Uni<String> register(JsonObject jsonObject) {
         return service.registerUser(jsonObject)
                 .onItem().transform(unused -> {
@@ -65,5 +63,15 @@ public class AuthService {
                     }
                     return users.get(0);
                 });
+    }
+
+    public Uni<Void> logout(String token) {
+        return Uni.createFrom().voidItem().invoke(() -> {
+            for (Map.Entry<String, String> entry : TOKENS.entrySet()) {
+                if (entry.getValue().equals(token)) {
+                    TOKENS.remove(entry.getKey());
+                }
+            }
+        });
     }
 }
