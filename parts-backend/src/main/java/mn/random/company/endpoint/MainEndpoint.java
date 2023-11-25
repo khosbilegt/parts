@@ -71,18 +71,22 @@ public class MainEndpoint {
     @GET
     @Path("/cart")
     public Uni<Response> fetchCart(@QueryParam("token") String token) {
-        return Uni.createFrom().item(Response.ok().build());
+        return service.fetchCart(token)
+                .onItem().transform(product -> Response.ok().entity(product).build())
+                .onFailure().recoverWithItem(this::handleFailure);
     }
 
     @PUT
-    @Path("/cart/add")
+    @Path("/cart")
     public Uni<Response> addToCart(@QueryParam("token") String token,
                                    @QueryParam("productId") String productId) {
-        return Uni.createFrom().item(Response.ok().build());
+        return service.addToCart(token, productId)
+                .onItem().transform(this::handleSuccess)
+                .onFailure().recoverWithItem(this::handleFailure);
     }
 
     @DELETE
-    @Path("/cart/remove")
+    @Path("/cart")
     public Uni<Response> removeFromCart(@QueryParam("token") String token,
                                         @QueryParam("cartItemId") String cartItemId) {
         return Uni.createFrom().item(Response.ok().build());

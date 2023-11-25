@@ -5,18 +5,14 @@ import io.vertx.core.json.JsonObject;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.NotFoundException;
-import mn.random.company.dto.Pagination;
-import mn.random.company.dto.Product;
-import mn.random.company.dto.User;
+import mn.random.company.dto.*;
 import mn.random.company.exception.AuthException;
-import mn.random.company.util.Utilities;
 import org.jboss.logging.Logger;
 
 import java.util.List;
 
 @ApplicationScoped
 public class MainService {
-    private static final Logger LOG = Logger.getLogger("PartsBackend");
     @Inject
     SQLService database;
     @Inject
@@ -55,5 +51,28 @@ public class MainService {
 
     public Uni<List<User>> fetchUserInfo(String parameter, String type, Pagination pagination) {
         return database.fetchUsers(parameter, type, pagination);
+    }
+
+    public Uni<List<CartItem>> fetchCart(String token) {
+        return auth.fetchUserByToken(token)
+                .onItem().transformToUni(user -> database.fetchCart(user.getId()))
+                .onItem().ifNull().failWith(new NotFoundException())
+                .onItem().ifNotNull().transformToUni(cart -> database.fetchCartItems(cart.getCartId()));
+    }
+
+    public Uni<Void> addToCart(String token, String productId) {
+        return database.fetchProducts(productId, "ID", null)
+                .onItem().transformToUni(products -> {
+                    if(products.isEmpty()) {
+                        throw new NotFoundException();
+                    }
+                    return auth.fetchUserByToken(token);
+                })
+                .onItem().transformToUni(user -> database.fetchCart(user.getId())
+                        .onItem().ifNull().switchTo(() -> database.createCart(user.getId())
+                                .onItem().transformToUni(unused -> database.fetchCart(user.getId())))
+                        .onItem().call(cart -> database.addToCart(user.getId(), productId))
+                )
+                .replaceWithVoid();
     }
 }

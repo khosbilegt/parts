@@ -22,6 +22,7 @@ CREATE TABLE Products(
     FOREIGN KEY(Seller) REFERENCES Users(UserID)
 );
 
+
 CREATE TABLE Orders(
     OrderID INT NOT NULL AUTO_INCREMENT,
     UserID INT NOT NULL,
@@ -59,4 +60,4 @@ CREATE TABLE CartItems(
     FOREIGN KEY(ProductID) REFERENCES Products(ProductID)
 );
 
-SELECT * FROM users;
+SELECT * FROM Products;
