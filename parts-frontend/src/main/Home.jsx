@@ -3,6 +3,7 @@ import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
 import { ProductCard } from './components';
 import { Input, Pagination, Typography, InputNumber, Button, MenuProps, Dropdown } from 'antd';
+import { IdentityDropdown } from './components';
 
 function Home() {
      const navigate = useNavigate();
@@ -48,19 +49,6 @@ function Home() {
                     setProducts(response.data)
                }
           });
-     }
-
-     const logout = () => {
-          const token = localStorage.getItem('parts-token');
-          const url = "http://127.0.0.1:8080/api/auth/logout?token=" + token;
-          axios.delete(url, {
-               headers: {
-                    'Content-Type': 'application/json',
-               }
-          })
-          .then(response => {
-               navigate('/login')
-          })
      }
 
      const fetchProductsWithArguments = () => {
@@ -134,23 +122,7 @@ function Home() {
           }
         ];
 
-     const userActionItems = [
-          {
-               key: '1',
-               label: 'Сагс',
-               onClick: () => navigate('/cart')
-          },
-          {
-               key: '2',
-               label: 'Бараа худалдаалах',
-               onClick: () => navigate('/sell')
-          },
-          {
-               key: '3',
-               label: 'Гарах',
-               onClick: () => logout()
-          }
-     ];
+
 
   return (
     <div style={{
@@ -168,11 +140,7 @@ function Home() {
                </Dropdown>
                <Input placeholder='Хайлтийн жишээ: Мотор' style={{width: '60vw'}} onSubmit={fetchProductsWithArguments} onChange={(e) => setSearchContent(e.target.value)}/>
                <Button onClick={fetchProductsWithArguments} type='primary'>Хайх</Button>
-               <Dropdown menu={{ items: userActionItems }} style={{float: 'right'}}>
-                    <Button onClick={(e) => e.preventDefault()}>
-                         {user?.firstName + " " + user?.lastName}
-                    </Button>
-               </Dropdown>
+               <IdentityDropdown user={user}/>
           </div>
           <Typography style={{marginTop: '25px'}}>Нийт {products?.size} илэрц олдлоо</Typography>
           <div style={{marginTop: '25px', display: 'flex'}}>
