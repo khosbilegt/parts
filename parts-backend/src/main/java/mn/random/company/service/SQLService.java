@@ -59,6 +59,7 @@ public class SQLService {
                     try(ResultSet resultSet = statement.executeQuery()) {
                         while(resultSet.next()) {
                             validated = true;
+                            System.out.println(resultSet.getString(1));
                         }
                     }
                 } catch (SQLException e) {

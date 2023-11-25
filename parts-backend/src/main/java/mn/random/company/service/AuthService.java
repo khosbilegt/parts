@@ -30,8 +30,8 @@ public class AuthService {
 
     public Uni<String> login(String email, String password) {
         return service.validateUser(email, password)
-                .onItem().transform(user -> {
-                    if(user != null) {
+                .onItem().transform(validated -> {
+                    if(validated) {
                         String token = UUID.randomUUID().toString();
                         if (TOKENS.containsKey(email)) {
                             return TOKENS.get(email);

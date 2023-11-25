@@ -1,8 +1,12 @@
-import React from 'react'
-import { Button, Form, Input } from 'antd';
+import { useState } from 'react'
+import { Button, Form, Input, Spin, message } from 'antd';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import './Auth.css';
 
 const Login = () => {
+     const [isLoading, setLoading] = useState(false);
+     const navigate = useNavigate();
 
      type FieldType = {
           email?: string;
@@ -11,49 +15,62 @@ const Login = () => {
 
      const onFinish = (values: any) => {
           const url = 'http://127.0.0.1:8080/api/auth/login';
+          setLoading(true)
           axios.post(url, values, {
                headers: {
                     'Content-Type': 'application/json',
                }
           })
           .then(response => {
-               console.log('POST request successful:', response.data);
+               console.log(response.data)
+               if(response.status == 200) {
+                    const token = response.data.token;
+                    localStorage.setItem('parts-token', token);
+                    message.success('Амжилттай нэвтэрлээ');
+                    navigate("register")
+               }
           })
           .catch(error => {
-               console.error('Error:', error);
+               setLoading(false)
+               if(error.response?.data?.message == 'EMAIL_OR_PASSWORD_INVALID') {
+                    message.error('Мэйл хаяг эсвэл пассворд буруу байна');
+               } else {
+                    message.error("Системийн алдаа гарлаа.")
+               }
           });
      }
 
-     const onFinishFailed = () => {
-
-     }
-
      return (
-          <Form
-               name="basic"
-               labelCol={{ span: 8 }}
-               wrapperCol={{ span: 16 }}
-               style={{ maxWidth: 600 }}
-               initialValues={{ remember: true }}
-               onFinish={onFinish}
-               onFinishFailed={onFinishFailed}
-               autoComplete="off"
-          >
+          <div className="center-container">
+            <Form
+              name="basic"
+              labelCol={{ span: 8 }}
+              wrapperCol={{ span: 16 }}
+              style={{maxWidth: '100vw'}}
+              initialValues={{ remember: true }}
+              onFinish={onFinish}
+              autoComplete="off"
+            >
                <Form.Item<FieldType> label="Email" name="email" rules={[{ required: true, message: 'Please input your username!' }]}>
-                    <Input />
+                    <Input size="large" placeholder='test@gmail.com'/>
                </Form.Item>
 
                <Form.Item<FieldType> label="Password" name="password" rules={[{ required: true, message: 'Please input your password!' }]}>
-                    <Input />
+                    <Input.Password size="large" placeholder='********'/>
                </Form.Item>
 
-               <Form.Item<FieldType> wrapperCol={{ offset: 8, span: 16 }}>
-                    <Button type="primary" htmlType='submit'>
+               <Form.Item<FieldType> wrapperCol={{ offset: 8, span: 16 }} style={{ textAlign: 'center' }}>
+                    <Button type="primary" htmlType='submit' style={{ marginRight: '8px' }}>
                          Submit
                     </Button>
+                    {
+                         isLoading ? <Spin /> : <></>
+                    }
                </Form.Item>
-          </Form>
-     )
+            </Form>
+          </div>
+        );
+     
 }
 
 export default Login
