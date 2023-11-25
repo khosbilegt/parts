@@ -6,6 +6,7 @@ import { Input, Pagination, Typography, InputNumber, Button, MenuProps, Dropdown
 
 function Home() {
      const navigate = useNavigate();
+     const [user, setUser] = useState({})
      const [products, setProducts] = useState({})
      const [page, setPage] = useState(1)
      const [minCost, setMinCost] = useState(10000)
@@ -24,6 +25,7 @@ function Home() {
           })
           .then(response => {
                if(response.status === 200) {
+                    setUser(response.data.user);
                     fetchProducts();
                }
           })
@@ -46,6 +48,19 @@ function Home() {
                     setProducts(response.data)
                }
           });
+     }
+
+     const logout = () => {
+          const token = localStorage.getItem('parts-token');
+          const url = "http://127.0.0.1:8080/api/auth/logout?token=" + token;
+          axios.delete(url, {
+               headers: {
+                    'Content-Type': 'application/json',
+               }
+          })
+          .then(response => {
+               navigate('/login')
+          })
      }
 
      const fetchProductsWithArguments = () => {
@@ -80,7 +95,7 @@ function Home() {
           return `₮ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
      }
 
-     const items = [
+     const searchTypeItems = [
           {
             key: '1',
             label: (
@@ -109,7 +124,7 @@ function Home() {
                ),
           },
           {
-               key: '2',
+               key: '4',
                label: (
                   <Button type='link' onClick={() => {
                        setSearchType("PRICE")
@@ -119,6 +134,23 @@ function Home() {
           }
         ];
 
+     const userActionItems = [
+          {
+               key: '1',
+               label: 'Сагс',
+               onClick: () => navigate('/cart')
+          },
+          {
+               key: '2',
+               label: 'Бараа худалдаалах',
+               onClick: () => navigate('/sell')
+          },
+          {
+               key: '3',
+               label: 'Гарах',
+               onClick: () => logout()
+          }
+     ];
 
   return (
     <div style={{
@@ -129,13 +161,18 @@ function Home() {
     }}>
           <div style={{display: 'flex', columnGap: '25px', alignItems: 'center'}}>
                <Typography>Хайлт: </Typography>
-               <Dropdown menu={{ items }}>
+               <Dropdown menu={{ items: searchTypeItems }}>
                     <Button onClick={(e) => e.preventDefault()}>
                          {searchTypeVisible}
                     </Button>
                </Dropdown>
                <Input placeholder='Хайлтийн жишээ: Мотор' style={{width: '60vw'}} onSubmit={fetchProductsWithArguments} onChange={(e) => setSearchContent(e.target.value)}/>
                <Button onClick={fetchProductsWithArguments} type='primary'>Хайх</Button>
+               <Dropdown menu={{ items: userActionItems }} style={{float: 'right'}}>
+                    <Button onClick={(e) => e.preventDefault()}>
+                         {user?.firstName + " " + user?.lastName}
+                    </Button>
+               </Dropdown>
           </div>
           <Typography style={{marginTop: '25px'}}>Нийт {products?.size} илэрц олдлоо</Typography>
           <div style={{marginTop: '25px', display: 'flex'}}>
