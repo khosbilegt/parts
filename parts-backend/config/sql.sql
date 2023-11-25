@@ -26,11 +26,13 @@ CREATE TABLE Products(
 CREATE TABLE Orders(
     OrderID INT NOT NULL AUTO_INCREMENT,
     UserID INT NOT NULL,
+    SellerID INT NOT NULL,
     State VARCHAR(20),
     CreateDate TIMESTAMP,
     DeliverDate TIMESTAMP,
     PRIMARY KEY(OrderID),
-    FOREIGN KEY(UserID) REFERENCES Users(UserID)
+    FOREIGN KEY(UserID) REFERENCES Users(UserID),
+    FOREIGN KEY(SellerID) REFERENCES Users(UserID)
 );
 
 CREATE TABLE OrderItem(
@@ -60,4 +62,5 @@ CREATE TABLE CartItems(
     FOREIGN KEY(ProductID) REFERENCES Products(ProductID)
 );
 
-SELECT * FROM Products;
+
+SELECT * FROM CartItems;

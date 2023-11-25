@@ -7,8 +7,8 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.NotFoundException;
 import mn.random.company.dto.*;
 import mn.random.company.exception.AuthException;
-import org.jboss.logging.Logger;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @ApplicationScoped
@@ -73,6 +73,36 @@ public class MainService {
                                 .onItem().transformToUni(unused -> database.fetchCart(user.getId())))
                         .onItem().call(cart -> database.addToCart(user.getId(), productId))
                 )
+                .replaceWithVoid();
+    }
+
+    public Uni<List<Order>> fetchOrders(String token) {
+        return auth.fetchUserByToken(token)
+                .onItem().transformToUni(user -> database.fetchOrders(user.getId()))
+                .onItem().transformToUni(orders -> {
+                    List<Uni<List<OrderItem>>> itemFetchUni = new ArrayList<>();
+                    for(Order order : orders) {
+                        itemFetchUni.add(database.fetchOrderItems(order.getOrderId()));
+                    }
+                    if(itemFetchUni.isEmpty()) {
+                        return Uni.createFrom().item(orders);
+                    }
+                    return Uni.join().all(itemFetchUni).andCollectFailures()
+                            .onItem().invoke(itemLists -> {
+                                for(int i = 0; i < itemLists.size(); i++) {
+                                    for(OrderItem item : itemLists.get(i)) {
+                                        orders.get(i).addOrderItem(item);
+                                    }
+                                }
+                            })
+                            .replaceWith(orders);
+                });
+    }
+
+    public Uni<Void> createOrder(String token) {
+        return auth.fetchUserByToken(token)
+                .onItem().transformToUni(user -> database.fetchCart(user.getId()))
+                .onItem().call(cart -> database.createOrder(cart))
                 .replaceWithVoid();
     }
 }

@@ -13,6 +13,38 @@ public class MainEndpoint {
     @Inject
     MainService service;
 
+
+    @GET
+    @Path("/user")
+    public Uni<Response> fetchUser(@QueryParam("userId") String userId) {
+        return service.fetchUserInfo(userId, "ID", null)
+                .onItem().transform(users -> {
+                    if (users.isEmpty()) {
+                        throw new NotFoundException();
+                    }
+                    return Response.ok().entity(users.get(0)).build();
+                })
+                .onFailure().recoverWithItem(this::handleFailure);
+    }
+
+    @GET
+    @Path("/user/browse")
+    public Uni<Response> fetchUsers(@QueryParam("parameter") String parameter,
+                                    @QueryParam("type") String type,
+                                    @QueryParam("pageSize") int pageSize,
+                                    @QueryParam("pageOffset") int pageOffset) {
+        Pagination pagination = new Pagination(pageSize, pageOffset);
+        return service.fetchUserInfo(parameter, type, pagination)
+                .onItem().ifNotNull().transform(users -> Response.ok().entity(
+                        new JsonObject()
+                                .put("users", users)
+                                .put("size", users.size())
+                                .put("pageSize", pagination.getPageSize())
+                                .put("pageOffset", pagination.getPageOffset())
+                ).build())
+                .onFailure().recoverWithItem(this::handleFailure);
+    }
+
     @GET
     @Path("/product")
     public Uni<Response> fetchProduct(@QueryParam("productId") String productId) {
@@ -57,18 +89,6 @@ public class MainEndpoint {
     }
 
     @GET
-    @Path("/order")
-    public Uni<Response> fetchOrder(@QueryParam("orderId") String orderId) {
-        return Uni.createFrom().item(Response.ok().build());
-    }
-
-    @POST
-    @Path("/order")
-    public Uni<Response> createOrder(@QueryParam("token") String token) {
-        return Uni.createFrom().item(Response.ok().build());
-    }
-
-    @GET
     @Path("/cart")
     public Uni<Response> fetchCart(@QueryParam("token") String token) {
         return service.fetchCart(token)
@@ -93,36 +113,20 @@ public class MainEndpoint {
     }
 
     @GET
-    @Path("/user")
-    public Uni<Response> fetchUser(@QueryParam("userId") String userId) {
-        return service.fetchUserInfo(userId, "ID", null)
-                .onItem().transform(users -> {
-                    if (users.isEmpty()) {
-                        throw new NotFoundException();
-                    }
-                    return Response.ok().entity(users.get(0)).build();
-                })
+    @Path("/order")
+    public Uni<Response> fetchOrder(@QueryParam("token") String token) {
+        return service.fetchOrders(token)
+                .onItem().transform(orders -> Response.ok().entity(orders).build())
                 .onFailure().recoverWithItem(this::handleFailure);
     }
 
-    @GET
-    @Path("/user/browse")
-    public Uni<Response> fetchUsers(@QueryParam("parameter") String parameter,
-                                    @QueryParam("type") String type,
-                                    @QueryParam("pageSize") int pageSize,
-                                    @QueryParam("pageOffset") int pageOffset) {
-        Pagination pagination = new Pagination(pageSize, pageOffset);
-        return service.fetchUserInfo(parameter, type, pagination)
-                .onItem().ifNotNull().transform(users -> Response.ok().entity(
-                        new JsonObject()
-                                .put("users", users)
-                                .put("size", users.size())
-                                .put("pageSize", pagination.getPageSize())
-                                .put("pageOffset", pagination.getPageOffset())
-                ).build())
+    @POST
+    @Path("/order")
+    public Uni<Response> createOrder(@QueryParam("token") String token) {
+        return service.createOrder(token)
+                .onItem().transform(orders -> Response.ok().entity(orders).build())
                 .onFailure().recoverWithItem(this::handleFailure);
     }
-
 
     private Response handleSuccess(Object ignored) {
         return Response.ok().entity(
@@ -144,12 +148,5 @@ public class MainEndpoint {
                             .put("message", throwable.getMessage())
             ).build();
         }
-    }
-
-    private Response handleBadRequest() {
-        return Response.status(Response.Status.BAD_REQUEST).entity(
-                new JsonObject()
-                        .put("status", "BAD_REQUEST")
-        ).build();
     }
 }
