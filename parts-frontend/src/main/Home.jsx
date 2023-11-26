@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import axios from 'axios'
 import { TopBar, FooterComponent } from "./components";
 import { Car } from "../resources/images";
-import { Card, Typography } from "antd";
+import { Card, Typography, Carousel, Spin } from "antd";
 import { CarOutlined, CheckCircleOutlined, ArrowDownOutlined } from "@ant-design/icons";
+import './Carousel.css'
 const { Title, Text } = Typography;
+
 
 function Home() {
   const [user, setUser] = useState({})
@@ -29,7 +31,6 @@ function Home() {
     .then(response => {
          if(response.status === 200) {
               setUser(response.data.user);
-              console.log(user)
          }
     })
     .catch(error => {
@@ -43,7 +44,7 @@ function Home() {
 
   return (
     <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
-      <TopBar selected={'/'} user={user}/>
+      <TopBar selected={'/'} user={user} />
       <Typography style={{textAlign: 'center'}}>
         <Title style={{fontFamily: "'Roboto', sans-serif"}}>СЭЛБЭГИЙН ОНЛАЙН ЗАХ</Title>
         <Text type='secondary'>Монголын иргэн бүрт машины сэлбэг худалдаалах хялбар шийдлийг хүргэх бол бидний зорилго юм.</Text>

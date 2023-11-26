@@ -29,9 +29,9 @@ function TopBar(props) {
 
      return (
           <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', width: '90vw'}}>
-               <img src={Logo} style={{height: '75px'}}/>
+               <a href='/'><img src={Logo} style={{height: '75px'}}/></a>
                <Menu onClick={navigateToPage} selectedKeys={props?.selected} items={menuItems} mode='horizontal' style={{minWidth: '400px', display: 'flex', justifyContent: 'center'}}/>
-               <IdentityDropdown user={props?.user} />
+               <IdentityDropdown user={props?.user}/>
           </div>
      )
 }

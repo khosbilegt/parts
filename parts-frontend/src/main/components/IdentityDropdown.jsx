@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Dropdown, Button, Typography } from 'antd';
+import { Dropdown, Button, Typography, Skeleton } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 
 function IdentityDropdown(props) {

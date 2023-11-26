@@ -11,8 +11,9 @@ public class Product {
     private String manufacturer;
     private int price;
     private int stock;
+    private String image;
 
-    public Product(String productID, String sellerID, String productName, String description, String category, String manufacturer, int price, int stock) {
+    public Product(String productID, String sellerID, String productName, String description, String category, String manufacturer, int price, int stock, String image) {
         this.productID = productID;
         this.productName = productName;
         this.sellerID = sellerID;
@@ -21,6 +22,7 @@ public class Product {
         this.manufacturer = manufacturer;
         this.price = price;
         this.stock = stock;
+        this.image = image;
     }
 
     public Product(JsonObject jsonObject, String sellerID) {
@@ -32,6 +34,7 @@ public class Product {
         this.manufacturer = jsonObject.getString("manufacturer");
         this.price = jsonObject.getInteger("price");
         this.stock = jsonObject.getInteger("stock");
+        this.image = jsonObject.getString("image");
     }
 
     public String getProductID() {
@@ -96,5 +99,13 @@ public class Product {
 
     public void setStock(int stock) {
         this.stock = stock;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }

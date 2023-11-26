@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Card, Button, message } from 'antd'
 import Typography from 'antd/es/typography/Typography'
+import { Placehodler } from '../../resources/images';
 
 function ProductCard(props) {
   const navigate = useNavigate();
@@ -28,6 +29,9 @@ function ProductCard(props) {
 
   return (
     <Card title={props.product.productName} style={{width: '300px'}}>
+      <div style={{width: '100%'}}>
+        <img src={Placehodler} style={{width: '75%', marginLeft: '12.5%'}}/>
+      </div>
       <Typography><span style={{fontWeight: 'bold'}}>Үйлдвэрлэгч:</span> {props.product.manufacturer}</Typography>
       <Typography><span style={{fontWeight: 'bold'}}>Төрөл:</span> {props.product.category}</Typography>
       <Typography><span style={{fontWeight: 'bold'}}>Үнэ:</span> {props.product.price}</Typography>

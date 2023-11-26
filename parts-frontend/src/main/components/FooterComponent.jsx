@@ -24,9 +24,9 @@ function FooterComponent() {
         </a></li>
     </ul>
     <ul class="menu">
-      <li class="menu__item"><a class="menu__link" href="#">Нүүр</a></li>
-      <li class="menu__item"><a class="menu__link" href="#">Бараа</a></li>
-      <li class="menu__item"><a class="menu__link" href="#">Бидний тухай</a></li>
+      <li class="menu__item"><a class="menu__link" href="/">Нүүр</a></li>
+      <li class="menu__item"><a class="menu__link" href="/browse">Бараа</a></li>
+      <li class="menu__item"><a class="menu__link" href="/about">Бидний тухай</a></li>
     </ul>
     <p>&copy;All Rights Reserved</p>
   </footer>

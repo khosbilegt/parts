@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
-import { ProductCard } from './components';
+import { ProductCard, TopBar } from './components';
 import { Input, Pagination, Typography, InputNumber, Button, Dropdown } from 'antd';
 import { IdentityDropdown } from './components';
 
@@ -87,7 +87,7 @@ function Browse() {
           {
             key: '1',
             label: (
-               <Button type='link' onClick={() => {
+               <Button type='text' style={{width: '100%'}} onClick={() => {
                     setSearchType("NAME")
                     setSearchTypeVisible("Нэрээр")
                }}>Нэрээр</Button>
@@ -96,7 +96,7 @@ function Browse() {
           {
                key: '2',
                label: (
-                  <Button type='link' onClick={() => {
+                    <Button type='text' style={{width: '100%'}} onClick={() => {
                        setSearchType("MANUFACTURER")
                        setSearchTypeVisible("Үйлдвэрлэгчээр")
                   }}>Үйлдвэрлэгчээр</Button>
@@ -105,7 +105,7 @@ function Browse() {
           {
                key: '3',
                label: (
-                  <Button type='link' onClick={() => {
+                    <Button type='text' style={{width: '100%'}} onClick={() => {
                        setSearchType("CATEGORY")
                        setSearchTypeVisible("Төрлөөр")
                   }}>Төрлөөр</Button>
@@ -114,7 +114,7 @@ function Browse() {
           {
                key: '4',
                label: (
-                  <Button type='link' onClick={() => {
+                  <Button type='text' style={{width: '100%'}} onClick={() => {
                        setSearchType("PRICE")
                        setSearchTypeVisible("Үнээр")
                   }}>Үнээр</Button>
@@ -122,30 +122,17 @@ function Browse() {
           }
         ];
 
-
-
   return (
-    <div style={{
-     display: 'flex',
-     flexDirection: 'column',
-     minHeight: '100vh',
-     padding: '10px',
-    }}>
-          <div style={{display: 'flex', columnGap: '25px', alignItems: 'center'}}>
-               <Typography>Хайлт: </Typography>
+     <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '100vh'}}>
+          <TopBar user={user} selected={'/browse'}/>
+          <div style={{display: 'flex', columnGap: '25px', alignItems: 'center', justifyContent: 'center', width: '80%'}}>
+               <Typography style={{minWidth: '50px'}} >Хайлт: </Typography>
                <Dropdown menu={{ items: searchTypeItems }}>
                     <Button onClick={(e) => e.preventDefault()}>
                          {searchTypeVisible}
                     </Button>
                </Dropdown>
-               <Input placeholder='Хайлтийн жишээ: Мотор' style={{width: '60vw'}} onSubmit={fetchProductsWithArguments} onChange={(e) => setSearchContent(e.target.value)}/>
-               <Button onClick={fetchProductsWithArguments} type='primary'>Хайх</Button>
-               <IdentityDropdown user={user}/>
-          </div>
-          <Typography style={{marginTop: '25px'}}>Нийт {products?.size} илэрц олдлоо</Typography>
-          <div style={{marginTop: '25px', display: 'flex', maxWidth: '100vw'}}>
-               <div style={{minWidth: '300px', minHeight: '100%', display: 'flex', flexDirection: 'column'}}>
-                    <Typography>Үнийн дээд ба доод хязгаар: </Typography>
+               {searchType === 'PRICE' ? ( 
                     <div style={{display: 'flex', columnGap: '10px'}}>
                          <InputNumber placeholder='Үнийн доод хязгаар' defaultValue={minCost} formatter={numberFormatter} disabled={searchType !== 'PRICE'}
                               onChange={(value) => setMinCost(value || 0)}/>
@@ -153,9 +140,15 @@ function Browse() {
                          <InputNumber placeholder='Үнийн дээд хязгаар' defaultValue={maxCost} formatter={numberFormatter}  disabled={searchType !== 'PRICE'}
                               onChange={(value) => setMaxCost(value || 0)}/>
                     </div>
-                    <p>Test</p>
-               </div>
-               <div style={{display: 'flex', columnGap: '25px', maxWidth: '60vw'}}>
+               ) 
+               : ( 
+                    <Input placeholder='Хайлтийн жишээ: Мотор' style={{width: '50vw'}} onSubmit={fetchProductsWithArguments} onChange={(e) => setSearchContent(e.target.value)}/>
+               )}
+               <Button onClick={fetchProductsWithArguments} type='primary'>Хайх</Button>
+          </div>
+          <Typography style={{marginTop: '25px'}}>Нийт {products?.size} илэрц олдлоо</Typography>
+          <div style={{marginTop: '25px', display: 'flex', width: '95vw', marginLeft: '2.5vw'}}>
+               <div style={{display: 'flex', columnGap: '25px', width: '100%', justifyContent: 'center'}}>
                     {products?.products?.map((product, index) => {
                          return <ProductCard product={product} key={index}/>
                     })}

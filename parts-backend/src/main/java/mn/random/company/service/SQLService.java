@@ -188,7 +188,8 @@ public class SQLService {
                                     resultSet.getString(5),
                                     resultSet.getString(6),
                                     resultSet.getInt(7),
-                                    resultSet.getInt(8)
+                                    resultSet.getInt(8),
+                                    resultSet.getString(9)
                             ));
                         }
                     }
@@ -209,8 +210,8 @@ public class SQLService {
         return Uni.createFrom().voidItem().invoke(unused -> {
             try(Connection connection = dataSource.getConnection()) {
                 connection.setAutoCommit(false);
-                String query = "INSERT INTO Products (Seller, ProductName, Description, Category, Manufacturer, Price, Stock) " +
-                        "VALUES(?,?,?,?,?,?,?)";
+                String query = "INSERT INTO Products (Seller, ProductName, Description, Category, Manufacturer, Price, Stock, Image) " +
+                        "VALUES(?,?,?,?,?,?,?,?)";
                 try(PreparedStatement statement = connection.prepareStatement(query)) {
                     statement.setString(1, product.getSellerID());
                     statement.setString(2, product.getProductName());
@@ -219,6 +220,7 @@ public class SQLService {
                     statement.setString(5, product.getManufacturer());
                     statement.setInt(6, product.getPrice());
                     statement.setInt(7, product.getStock());
+                    statement.setString(8, product.getImage());
                     statement.executeUpdate();
                 } catch(SQLException e) {
                     LOG.errorv(e, "SQL_Exception during Create Product (Insert): {0}", e.getMessage());
