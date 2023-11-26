@@ -6,7 +6,7 @@ import {
   RouterProvider
 } from 'react-router-dom';
 import { Login, Register } from './auth';
-import { Home, Cart } from './main';
+import { Home, Cart, Order, Sell } from './main';
 
 
 const router = createBrowserRouter([
@@ -26,6 +26,14 @@ const router = createBrowserRouter([
     path: "/cart",
     element: <Cart />
   },
+  {
+    path: '/orders',
+    element: <Order />
+  },
+  {
+    path: '/sell',
+    element: <Sell />
+  }
 ]);
 
 const root = ReactDOM.createRoot(

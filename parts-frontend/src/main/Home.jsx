@@ -143,7 +143,7 @@ function Home() {
                <IdentityDropdown user={user}/>
           </div>
           <Typography style={{marginTop: '25px'}}>Нийт {products?.size} илэрц олдлоо</Typography>
-          <div style={{marginTop: '25px', display: 'flex'}}>
+          <div style={{marginTop: '25px', display: 'flex', maxWidth: '100vw'}}>
                <div style={{minWidth: '300px', minHeight: '100%', display: 'flex', flexDirection: 'column'}}>
                     <Typography>Үнийн дээд ба доод хязгаар: </Typography>
                     <div style={{display: 'flex', columnGap: '10px'}}>
@@ -155,7 +155,7 @@ function Home() {
                     </div>
                     <p>Test</p>
                </div>
-               <div style={{display: 'flex', columnGap: '25px'}}>
+               <div style={{display: 'flex', columnGap: '25px', maxWidth: '60vw'}}>
                     {products?.products?.map((product, index) => {
                          return <ProductCard product={product} key={index}/>
                     })}

@@ -1,5 +1,6 @@
 package mn.random.company.dto;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,19 +8,21 @@ import java.util.List;
 public class Order {
     private String orderId;
     private String userId;
-    private String sellerID;
     private String state;
     private LocalDateTime createDate;
     private LocalDateTime deliveryDate;
     private final List<OrderItem> items = new ArrayList<>();
 
-    public Order(String orderId, String userId, String sellerID, String state, LocalDateTime createDate, LocalDateTime deliveryDate) {
+    public Order(String orderId, String userId, String state, Timestamp createTimestamp, Timestamp deliveryTimestamp) {
         this.orderId = orderId;
         this.userId = userId;
-        this.sellerID = sellerID;
         this.state = state;
-        this.createDate = createDate;
-        this.deliveryDate = deliveryDate;
+        this.createDate = createTimestamp.toLocalDateTime();
+        if(deliveryTimestamp == null) {
+            this.deliveryDate = null;
+        } else {
+            this.deliveryDate = deliveryTimestamp.toLocalDateTime();
+        }
     }
 
     public String getOrderId() {
@@ -62,15 +65,11 @@ public class Order {
         this.deliveryDate = deliveryDate;
     }
 
-    public String getSellerID() {
-        return sellerID;
-    }
-
-    public void setSellerID(String sellerID) {
-        this.sellerID = sellerID;
-    }
-
     public void addOrderItem(OrderItem item) {
         items.add(item);
+    }
+
+    public List<OrderItem> getItems() {
+        return items;
     }
 }

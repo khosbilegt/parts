@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { IdentityDropdown } from './components'
 import axios from 'axios';
-import { InputNumber, List, Button, Divider, Typography} from 'antd';
+import { InputNumber, List, Button, Divider, Typography, message } from 'antd';
 
 function Cart() {
      const navigate = useNavigate();
@@ -30,7 +30,7 @@ function Cart() {
                }
           })
           .catch(error => {
-               if(error.response.data?.message === "TOKEN_INVALID") {
+               if(error.response?.data?.message === "TOKEN_INVALID") {
                     navigate("/login")  
                }
           });
@@ -56,7 +56,7 @@ function Cart() {
                }
           })
           .catch(error => {
-               if(error.response.data?.message === "TOKEN_INVALID") {
+               if(error.response?.data?.message === "TOKEN_INVALID") {
                     navigate("/login")  
                }
           });
@@ -90,6 +90,28 @@ function Cart() {
           setTotalCost(total)
      }
 
+     const createOrder = () => {
+          const token = localStorage.getItem('parts-token');
+          const url = "http://127.0.0.1:8080/api/order?token=" + token;
+          axios.post(url, {}, {
+               headers: {
+                    'Content-Type': 'application/json',
+               }
+          })
+          .then(response => {
+               if(response.status === 200) {
+                    fetchCart()
+                    setTotalCost(0)
+                    message.success("Захиалга амжилттай үүслээ")
+               }
+          })
+          .catch(error => {
+               if(error.response.data?.message === "TOKEN_INVALID") {
+                    navigate("/login")  
+               }
+          });
+     }
+
   return (
      <div style={{
           display: 'flex',
@@ -99,7 +121,7 @@ function Cart() {
          }}
      >
           <div style={{display: 'flex', width: '100%', justifyContent: 'space-between'}}>
-               <IdentityDropdown user={user} />
+               <Button href='/'>Буцах</Button>
                <IdentityDropdown user={user} />
           </div>
           <List style={{marginTop: '10px', marginLeft: '10vw', width: '80vw'}} loading={isLoading} dataSource={cartItems?.cartItems} renderItem={(item) => {
@@ -107,7 +129,7 @@ function Cart() {
                     <List.Item
                          actions={[<Button key="delete" type='default' onClick={e => removeFromCart(item?.cartItemId)}>Устгах</Button>]}>
                          <List.Item.Meta
-                              title={<a href="https://ant.design">{item?.product?.productName}</a>}
+                              title={<Typography>{item?.product?.productName}</Typography>}
                               description={item?.product?.description}
                          />
                          <div style={{display: 'flex'}}>
@@ -121,7 +143,7 @@ function Cart() {
                <Divider />
                <Typography><b>Захиалгын нийт үнэ: </b> {totalCost}</Typography>
                <List.Item style={{width: '100%', display: 'flex'}}>
-                    <Button type='primary' style={{float: 'right'}}>Захиалах</Button>
+                    <Button type='primary' style={{float: 'right'}} onClick={createOrder}>Захиалах</Button>
                </List.Item>
           </List>
     </div>

@@ -328,6 +328,26 @@ public class SQLService {
         });
     }
 
+    public Uni<Void> emptyCart(String cartId) {
+        return Uni.createFrom().voidItem().invoke(unused -> {
+            try(Connection connection = dataSource.getConnection()) {
+                connection.setAutoCommit(false);
+                String query = "DELETE FROM CartItems WHERE CartID = ?";
+                try(PreparedStatement statement = connection.prepareStatement(query)) {
+                    statement.setString(1, cartId);
+                    statement.executeUpdate();
+                } catch(SQLException e) {
+                    LOG.errorv(e, "SQL_Exception during Create Product (Insert): {0}", e.getMessage());
+                    throw new RuntimeException("PRODUCT_CREATION_FAILED");
+                }
+                connection.commit();
+            } catch (SQLException e) {
+                LOG.errorv(e, "SQL_Exception during Create Product (Connect): {0}", e.getMessage());
+                throw new RuntimeException("PRODUCT_CREATION_FAILED");
+            }
+        });
+    }
+
     public Uni<List<CartItem>> fetchCartItems(String cartId) {
         return Uni.createFrom().item(() -> {
             List<CartItem> itemList = new ArrayList<>();
@@ -384,21 +404,19 @@ public class SQLService {
     public Uni<List<Order>> fetchOrders(String userId) {
         return Uni.createFrom().item(() -> {
             List<Order> orderList = new ArrayList<>();
-            String query = "SELECT * FROM Orders WHERE SellerID = ? OR UserID = ?";
+            String query = "SELECT * FROM Orders WHERE UserID = ?";
             try(Connection connection = dataSource.getConnection()) {
                 connection.setAutoCommit(false);
                 try(PreparedStatement statement = connection.prepareStatement(query)) {
                     statement.setString(1, userId);
-                    statement.setString(2, userId);
                     try(ResultSet resultSet = statement.executeQuery()) {
                         while(resultSet.next()) {
                             orderList.add(new Order(
                                     resultSet.getString(1),
                                     resultSet.getString(2),
                                     resultSet.getString(3),
-                                    resultSet.getString(4),
-                                    resultSet.getTimestamp(5).toLocalDateTime(),
-                                    resultSet.getTimestamp(6).toLocalDateTime()
+                                    resultSet.getTimestamp(4),
+                                    resultSet.getTimestamp(5)
                             ));
                         }
                     }
@@ -418,7 +436,7 @@ public class SQLService {
     public Uni<List<OrderItem>> fetchOrderItems(String orderId) {
         return Uni.createFrom().item(() -> {
             List<OrderItem> itemList = new ArrayList<>();
-            String query = "SELECT * FROM OrderItems WHERE OrderID = ?";
+            String query = "SELECT * FROM OrderItem WHERE OrderID = ?";
             try(Connection connection = dataSource.getConnection()) {
                 connection.setAutoCommit(false);
                 try(PreparedStatement statement = connection.prepareStatement(query)) {
@@ -449,8 +467,9 @@ public class SQLService {
     public Uni<Void> createOrder(Cart cart) {
         return Uni.createFrom().voidItem().call(unused -> {
             String createOrderQuery = "INSERT INTO Orders (UserID, State, CreateDate, DeliverDate) " +
-                    "VALUES (?, ?, ?, CURRENT_TIMESTAMP, NULL)";
+                    "VALUES (?, ?, CURRENT_TIMESTAMP, NULL)";
             try(Connection connection = dataSource.getConnection()) {
+                connection.setAutoCommit(false);
                 try (PreparedStatement preparedStatement = connection.prepareStatement(createOrderQuery, PreparedStatement.RETURN_GENERATED_KEYS)) {
                     preparedStatement.setString(1, cart.getUserId());
                     preparedStatement.setString(2, "RECEIVED");
@@ -458,15 +477,14 @@ public class SQLService {
                     try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
                         if (generatedKeys.next()) {
                             String orderId = generatedKeys.getString(1);
-                            return convertCartItemsToOrderItems(connection, cart.getCartId(), orderId)
-                                    .onItem().invoke(ignored -> {
-                                        try {
-                                            connection.commit();
-                                        } catch (SQLException e) {
-                                            LOG.errorv(e, "SQL_Exception during Create Order (Commit): {0}", e.getMessage());
-                                            throw new RuntimeException("INSERT_FAILED");
-                                        }
-                                    });
+                            String convertItemsQuery = "INSERT INTO OrderItem (OrderID, ProductID, Quantity) " +
+                                    "SELECT ?, ci.ProductID, ci.Quantity FROM CartItems ci WHERE ci.CartID = ?";
+                            PreparedStatement transferStatement = connection.prepareStatement(convertItemsQuery);
+                            transferStatement.setString(1, orderId);
+                            transferStatement.setString(2, cart.getCartId());
+                            transferStatement.executeUpdate();
+                            connection.commit();
+                            return Uni.createFrom().voidItem();
                         } else {
                             throw new SQLException("Creating order failed, no ID obtained.");
                         }
@@ -478,41 +496,6 @@ public class SQLService {
             } catch(SQLException e) {
                 LOG.errorv(e, "SQL_Exception during Create Order (Connect): {0}", e.getMessage());
                 throw new RuntimeException("INSERT_FAILED");
-            }
-        });
-    }
-
-    private Uni<Void> convertCartItemsToOrderItems(Connection connection, String orderID, String cartID) {
-        return Uni.createFrom().voidItem().invoke(unused -> {
-            String convertItemsQuery = "INSERT INTO OrderItem (OrderID, ProductID, Quantity) " +
-                    "SELECT ?, ci.ProductID, ci.Quantity FROM CartItems ci WHERE ci.CartID = ?";
-            try (PreparedStatement preparedStatement = connection.prepareStatement(convertItemsQuery)) {
-                preparedStatement.setString(1, orderID);
-                preparedStatement.setString(2, cartID);
-                preparedStatement.executeUpdate();
-            } catch (SQLException e) {
-                LOG.errorv(e, "SQL_Exception during Create Order (Insert 2): {0}", e.getMessage());
-                throw new RuntimeException("INSERT_FAILED");
-            }
-        });
-    }
-
-    public Uni<Void> deleteOrder(String orderId) {
-        return Uni.createFrom().voidItem().invoke(unused -> {
-            try(Connection connection = dataSource.getConnection()) {
-                connection.setAutoCommit(false);
-                String query = "DELETE FROM Orders WHERE OrderId = ?";
-                try(PreparedStatement statement = connection.prepareStatement(query)) {
-                    statement.setString(1, orderId);
-                    statement.executeUpdate();
-                } catch(SQLException e) {
-                    LOG.errorv(e, "SQL_Exception during Delete Product (Delete): {0}", e.getMessage());
-                    throw new RuntimeException("ORDER_DELETION_FAILED");
-                }
-                connection.commit();
-            } catch (SQLException e) {
-                LOG.errorv(e, "SQL_Exception during Create Product (Connect): {0}", e.getMessage());
-                throw new RuntimeException("ORDER_DELETION_FAILED");
             }
         });
     }

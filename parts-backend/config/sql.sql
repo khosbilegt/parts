@@ -26,7 +26,6 @@ CREATE TABLE Products(
 CREATE TABLE Orders(
     OrderID INT NOT NULL AUTO_INCREMENT,
     UserID INT NOT NULL,
-    SellerID INT NOT NULL,
     State VARCHAR(20),
     CreateDate TIMESTAMP,
     DeliverDate TIMESTAMP,

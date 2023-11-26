@@ -129,6 +129,7 @@ public class MainService {
         return auth.fetchUserByToken(token)
                 .onItem().transformToUni(user -> database.fetchCart(user.getId()))
                 .onItem().call(cart -> database.createOrder(cart))
+                .onItem().call(cart -> database.emptyCart(cart.getCartId()))
                 .replaceWithVoid();
     }
 }
