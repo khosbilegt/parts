@@ -18,7 +18,7 @@ const Register = () => {
         };
 
      const onFinish = (values: any) => {
-          const url = 'http://127.0.0.1:8080/api/auth/register';
+          const url = 'http://5.161.118.247:8089/api/auth/register';
           setLoading(true)
           axios.post(url, values, {
                headers: {

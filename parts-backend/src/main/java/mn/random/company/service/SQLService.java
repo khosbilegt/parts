@@ -304,7 +304,7 @@ public class SQLService {
         });
     }
 
-    public Uni<Void> addToCart(String userId, String productId) {
+    public Uni<Void> addToCart(String cartId, String productId) {
         return Uni.createFrom().voidItem().invoke(unused -> {
             try(Connection connection = dataSource.getConnection()) {
                 connection.setAutoCommit(false);
@@ -312,17 +312,17 @@ public class SQLService {
                         "VALUES (?, ?, ?) " +
                         "ON DUPLICATE KEY UPDATE Quantity = Quantity + 1";
                 try(PreparedStatement statement = connection.prepareStatement(query)) {
-                    statement.setString(1, userId);
+                    statement.setString(1, cartId);
                     statement.setString(2, productId);
                     statement.setInt(3, 1);
                     statement.executeUpdate();
                 } catch(SQLException e) {
-                    LOG.errorv(e, "SQL_Exception during Create Product (Insert): {0}", e.getMessage());
+                    LOG.errorv(e, "SQL_Exception during Add to Cart (Insert): {0}", e.getMessage());
                     throw new RuntimeException("PRODUCT_CREATION_FAILED");
                 }
                 connection.commit();
             } catch (SQLException e) {
-                LOG.errorv(e, "SQL_Exception during Create Product (Connect): {0}", e.getMessage());
+                LOG.errorv(e, "SQL_Exception during Add to Cart (Connect): {0}", e.getMessage());
                 throw new RuntimeException("PRODUCT_CREATION_FAILED");
             }
         });

@@ -21,6 +21,14 @@ public class AuthService {
 
     public Uni<String> register(JsonObject jsonObject) {
         return service.registerUser(jsonObject)
+                .onItem().transformToUni(unused ->
+                        service.fetchUsers(jsonObject.getString("email"), "EMAIL", null))
+                .onItem().call(users -> {
+                    if(users.isEmpty()) {
+                        throw new RuntimeException("REGISTRATION_ERROR");
+                    }
+                    return service.createCart(users.get(0).getId());
+                })
                 .onItem().transform(unused -> {
                     String email = jsonObject.getString("email");
                     String token = UUID.randomUUID().toString();

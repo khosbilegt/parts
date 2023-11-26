@@ -30,8 +30,7 @@ CREATE TABLE Orders(
     CreateDate TIMESTAMP,
     DeliverDate TIMESTAMP,
     PRIMARY KEY(OrderID),
-    FOREIGN KEY(UserID) REFERENCES Users(UserID),
-    FOREIGN KEY(SellerID) REFERENCES Users(UserID)
+    FOREIGN KEY(UserID) REFERENCES Users(UserID)
 );
 
 CREATE TABLE OrderItem(
@@ -71,7 +70,7 @@ ON DUPLICATE KEY UPDATE Quantity = Quantity + 1
 DELETE FROM CartItems
 WHERE CartItemI = 5
 
-SELECT * FROM CartItems
+SELECT * FROM Products
 
 
 SELECT * FROM CartItems;

@@ -8,7 +8,7 @@ function ProductCard(props) {
 
   const addToCart = () => {
     const token = localStorage.getItem('parts-token');
-    const url = 'http://127.0.0.1:8080/api/cart?token=' + token + "&productId=" + props.product.productID;
+    const url = 'http://5.161.118.247:8089/api/cart?token=' + token + "&productId=" + props.product.productID;
     axios.put(url, {}, {
       headers: {
            'Content-Type': 'application/json',

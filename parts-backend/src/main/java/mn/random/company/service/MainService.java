@@ -84,15 +84,8 @@ public class MainService {
                     }
                     return auth.fetchUserByToken(token);
                 })
-                .onItem().transformToUni(user -> database.fetchCart(user.getId())
-                        .onFailure().recoverWithUni(throwable -> {
-                            if (throwable instanceof NotFoundException) {
-                                return database.createCart(user.getId())
-                                        .onItem().transformToUni(unused -> database.fetchCart(user.getId()));
-                            }
-                            throw new RuntimeException(throwable.getMessage());
-                        }))
-                .onItem().call(cart -> database.addToCart(cart.getUserId(), productId))
+                .onItem().transformToUni(user -> database.fetchCart(user.getId()))
+                .onItem().call(cart -> database.addToCart(cart.getCartId(), productId))
                 .replaceWithVoid();
     }
 

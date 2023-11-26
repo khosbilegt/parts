@@ -8,25 +8,10 @@ import axios from "axios";
 function Sell() {
      const navigate = useNavigate();
      const [user, setUser] = useState({})
-     const [isLoading, setLoading] = useState(true)
-     const [orderItems, setOrderItems] = useState({})
-
-     type FieldType = {
-          productName?: string;
-          description?: string;
-          category?: string,
-          manufacturer?: string,
-          price?: number,
-          stock?: number
-        };
-
-     useEffect(() => {
-          validateToken()
-     }, [])
 
      const validateToken = () => {
           const token = localStorage.getItem('parts-token');
-          const url = "http://127.0.0.1:8080/api/auth?token=" + token;
+          const url = "http://5.161.118.247:8089/api/auth?token=" + token;
           axios.get(url, {
                headers: {
                     'Content-Type': 'application/json',
@@ -46,9 +31,8 @@ function Sell() {
 
      const createProduct = (values: any) => {
           const token = localStorage.getItem('parts-token');
-          const url = 'http://127.0.0.1:8080/api/product';
+          const url = 'http://5.161.118.247:8089/api/product';
           const updatedValues = { ...values, token };
-          setLoading(true)
           console.log(values)
           axios.post(url, updatedValues, {
                headers: {
@@ -62,7 +46,6 @@ function Sell() {
                }
           })
           .catch(error => {
-               setLoading(false)
                if(error.response?.data?.message === 'EMAIL_OR_PASSWORD_INVALID') {
                     message.error('Мэйл хаяг эсвэл пассворд буруу байна');
                } else if(error.response?.data?.message === "TOKEN_INVALID") {
@@ -74,6 +57,10 @@ function Sell() {
                }
           });
      }
+
+     useEffect(() => {
+          validateToken()
+     }, [])
 
      return (
           <div style={{

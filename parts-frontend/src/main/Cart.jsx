@@ -17,7 +17,7 @@ function Cart() {
 
      const validateToken = () => {
           const token = localStorage.getItem('parts-token');
-          const url = "http://127.0.0.1:8080/api/auth?token=" + token;
+          const url = "http://5.161.118.247:8089/api/auth?token=" + token;
           axios.get(url, {
                headers: {
                     'Content-Type': 'application/json',
@@ -39,7 +39,7 @@ function Cart() {
      const fetchCart = () => {
           setLoading(true)
           const token = localStorage.getItem('parts-token');
-          const url = "http://127.0.0.1:8080/api/cart?token=" + token;
+          const url = "http://5.161.118.247:8089/api/cart?token=" + token;
           axios.get(url, {
                headers: {
                     'Content-Type': 'application/json',
@@ -64,7 +64,7 @@ function Cart() {
      
      const removeFromCart = (cartItemId) => {
           const token = localStorage.getItem('parts-token');
-          const url = "http://127.0.0.1:8080/api/cart?token=" + token + "&cartItemId=" + cartItemId;
+          const url = "http://5.161.118.247:8089/api/cart?token=" + token + "&cartItemId=" + cartItemId;
           axios.delete(url, {
                headers: {
                     'Content-Type': 'application/json',
@@ -92,7 +92,7 @@ function Cart() {
 
      const createOrder = () => {
           const token = localStorage.getItem('parts-token');
-          const url = "http://127.0.0.1:8080/api/order?token=" + token;
+          const url = "http://5.161.118.247:8089/api/order?token=" + token;
           axios.post(url, {}, {
                headers: {
                     'Content-Type': 'application/json',

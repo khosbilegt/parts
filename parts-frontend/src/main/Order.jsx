@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { IdentityDropdown } from './components'
 import axios from 'axios';
-import { InputNumber, List, Button, Divider, Typography, Badge, Tag} from 'antd';
+import { List, Button, Typography, Badge, Tag} from 'antd';
 
 function Order() {
      const navigate = useNavigate();
@@ -16,7 +16,7 @@ function Order() {
 
      const validateToken = () => {
           const token = localStorage.getItem('parts-token');
-          const url = "http://127.0.0.1:8080/api/auth?token=" + token;
+          const url = "http://5.161.118.247:8089/api/auth?token=" + token;
           axios.get(url, {
                headers: {
                     'Content-Type': 'application/json',
@@ -38,7 +38,7 @@ function Order() {
      const fetchOrders = () => {
           setLoading(true)
           const token = localStorage.getItem('parts-token');
-          const url = "http://127.0.0.1:8080/api/order?token=" + token;
+          const url = "http://5.161.118.247:8089/api/order?token=" + token;
           axios.get(url, {
                headers: {
                     'Content-Type': 'application/json',

@@ -14,7 +14,7 @@ const Login = () => {
         };
 
      const onFinish = (values: any) => {
-          const url = 'http://127.0.0.1:8080/api/auth/login';
+          const url = 'http://5.161.118.247:8089/api/auth/login';
           setLoading(true)
           axios.post(url, values, {
                headers: {
