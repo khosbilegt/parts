@@ -18,6 +18,11 @@ function IdentityDropdown(props) {
           },
           {
                key: '3',
+               label: 'Захиалгууд',
+               onClick: () => navigate('/orders')
+          },
+          {
+               key: '4',
                label: 'Гарах',
                onClick: () => logout()
           }

@@ -109,7 +109,9 @@ public class MainEndpoint {
     @Path("/cart")
     public Uni<Response> removeFromCart(@QueryParam("token") String token,
                                         @QueryParam("cartItemId") String cartItemId) {
-        return Uni.createFrom().item(Response.ok().build());
+        return service.removeFromCart(token, cartItemId)
+                .onItem().transform(this::handleSuccess)
+                .onFailure().recoverWithItem(this::handleFailure);
     }
 
     @GET

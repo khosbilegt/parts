@@ -52,7 +52,7 @@ function Home() {
      }
 
      const fetchProductsWithArguments = () => {
-          if(searchType.length == 0) {
+          if(searchType.length === 0) {
                fetchProducts();
           } else {
                const pageOffset = (page - 1) * 12;
@@ -150,7 +150,7 @@ function Home() {
                          <InputNumber placeholder='Үнийн доод хязгаар' defaultValue={minCost} formatter={numberFormatter} disabled={searchType !== 'PRICE'}
                               onChange={(value) => setMinCost(value || 0)}/>
                          <Typography>-</Typography>
-                         <InputNumber placeholder='Үнийн дээд хязгаар' defaultValue={maxCost} formatter={numberFormatter}  disabled={searchType != 'PRICE'}
+                         <InputNumber placeholder='Үнийн дээд хязгаар' defaultValue={maxCost} formatter={numberFormatter}  disabled={searchType !== 'PRICE'}
                               onChange={(value) => setMaxCost(value || 0)}/>
                     </div>
                     <p>Test</p>

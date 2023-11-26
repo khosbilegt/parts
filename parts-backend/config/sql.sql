@@ -62,5 +62,17 @@ CREATE TABLE CartItems(
     FOREIGN KEY(ProductID) REFERENCES Products(ProductID)
 );
 
+ALTER TABLE CartItems
+ADD CONSTRAINT UNIQUE_PRODUCT UNIQUE (CartID, ProductID);
+
+INSERT INTO CartItems (CartID, ProductID, Quantity) 
+VALUES (1, 2, 1) 
+ON DUPLICATE KEY UPDATE Quantity = Quantity + 1
+
+DELETE FROM CartItems
+WHERE CartItemI = 5
+
+SELECT * FROM CartItems
+
 
 SELECT * FROM CartItems;

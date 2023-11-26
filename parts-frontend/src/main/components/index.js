@@ -3,5 +3,5 @@ import IdentityDropdown from "./IdentityDropdown";
 
 export {
      ProductCard,
-     IdentityDropdown
+     IdentityDropdown,
 }

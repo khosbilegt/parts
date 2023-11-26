@@ -359,6 +359,27 @@ public class SQLService {
         });
     }
 
+    public Uni<Void> deleteCartItem(String cartItemId) {
+        return Uni.createFrom().voidItem().invoke(unused -> {
+            try(Connection connection = dataSource.getConnection()) {
+                connection.setAutoCommit(false);
+                String query = "DELETE FROM CartItems " +
+                        "WHERE CartItemID = ?";
+                try(PreparedStatement statement = connection.prepareStatement(query)) {
+                    statement.setString(1, cartItemId);
+                    statement.executeUpdate();
+                } catch(SQLException e) {
+                    LOG.errorv(e, "SQL_Exception during Delete CartItem (Insert): {0}", e.getMessage());
+                    throw new RuntimeException("CART_ITEM_DELETION_FAILED");
+                }
+                connection.commit();
+            } catch (SQLException e) {
+                LOG.errorv(e, "SQL_Exception during Delete CartItem (Connect): {0}", e.getMessage());
+                throw new RuntimeException("CART_ITEM_DELETION_FAILED");
+            }
+        });
+    }
+
 
     public Uni<List<Order>> fetchOrders(String userId) {
         return Uni.createFrom().item(() -> {

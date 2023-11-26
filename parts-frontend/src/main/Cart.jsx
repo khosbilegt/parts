@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { IdentityDropdown } from './components'
 import axios from 'axios';
-import { Typography } from 'antd';
+import { InputNumber, List, Button, Divider, Typography} from 'antd';
 
 function Cart() {
      const navigate = useNavigate();
      const [user, setUser] = useState({})
-     const [cartItems, setCartItems] = useState([])
+     const [isLoading, setLoading] = useState(true)
+     const [cartItems, setCartItems] = useState({})
+     const [totalCost, setTotalCost] = useState(0)
 
      useEffect(() => {
           validateToken()
@@ -35,6 +37,7 @@ function Cart() {
      }
 
      const fetchCart = () => {
+          setLoading(true)
           const token = localStorage.getItem('parts-token');
           const url = "http://127.0.0.1:8080/api/cart?token=" + token;
           axios.get(url, {
@@ -44,8 +47,32 @@ function Cart() {
           })
           .then(response => {
                if(response.status === 200) {
-                    console.log(response.data)
-                    setCartItems(response.data)
+                    const items = {
+                         cartItems: response.data
+                    }
+                    setCartItems(items)
+                    setLoading(false)
+                    calcualteTotal()
+               }
+          })
+          .catch(error => {
+               if(error.response.data?.message === "TOKEN_INVALID") {
+                    navigate("/login")  
+               }
+          });
+     }
+     
+     const removeFromCart = (cartItemId) => {
+          const token = localStorage.getItem('parts-token');
+          const url = "http://127.0.0.1:8080/api/cart?token=" + token + "&cartItemId=" + cartItemId;
+          axios.delete(url, {
+               headers: {
+                    'Content-Type': 'application/json',
+               }
+          })
+          .then(response => {
+               if(response.status === 200) {
+                    fetchCart()
                }
           })
           .catch(error => {
@@ -55,11 +82,19 @@ function Cart() {
           });
      }
 
+     const calcualteTotal = () => {
+          var total = 0
+          cartItems.cartItems.forEach((item) => {
+               total += item?.quantity * item?.product.price
+          })
+          setTotalCost(total)
+     }
+
   return (
      <div style={{
           display: 'flex',
           flexDirection: 'column',
-          minHeight: '100vh',
+          minHeight: '90vh',
           padding: '10px',
          }}
      >
@@ -67,11 +102,28 @@ function Cart() {
                <IdentityDropdown user={user} />
                <IdentityDropdown user={user} />
           </div>
-          <div>
-               {cartItems.map((item, index) => {
-                    return <Typography index={index}>{item?.product?.productName}</Typography>
-               })}
-          </div>
+          <List style={{marginTop: '10px', marginLeft: '10vw', width: '80vw'}} loading={isLoading} dataSource={cartItems?.cartItems} renderItem={(item) => {
+               return (
+                    <List.Item
+                         actions={[<Button key="delete" type='default' onClick={e => removeFromCart(item?.cartItemId)}>Устгах</Button>]}>
+                         <List.Item.Meta
+                              title={<a href="https://ant.design">{item?.product?.productName}</a>}
+                              description={item?.product?.description}
+                         />
+                         <div style={{display: 'flex'}}>
+                              <InputNumber prefix={"Үнэ: "} value={item?.quantity} suffix={" x " + item?.product?.price + " = " + (item?.product?.price * item?.quantity)}
+                              style={{minWidth: "200px"}} disabled={true}
+                              />
+                         </div>
+                    </List.Item>
+               )
+          }}>
+               <Divider />
+               <Typography><b>Захиалгын нийт үнэ: </b> {totalCost}</Typography>
+               <List.Item style={{width: '100%', display: 'flex'}}>
+                    <Button type='primary' style={{float: 'right'}}>Захиалах</Button>
+               </List.Item>
+          </List>
     </div>
   )
 }

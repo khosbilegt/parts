@@ -56,7 +56,7 @@ public class MainService {
     public Uni<List<CartItem>> fetchCart(String token) {
         return auth.fetchUserByToken(token)
                 .onItem().transformToUni(user -> database.fetchCart(user.getId()))
-                .onItem().ifNull().failWith(new NotFoundException())
+                .onItem().ifNull().failWith(new NotFoundException("CART_NOT_FOUND"))
                 .onItem().ifNotNull().transformToUni(cart -> database.fetchCartItems(cart.getCartId()))
                 .onItem().transformToUni(cartItems -> {
                     List<Uni<List<Product>>> productFetchUni = new ArrayList<>();
@@ -80,15 +80,25 @@ public class MainService {
         return database.fetchProducts(productId, "ID", null)
                 .onItem().transformToUni(products -> {
                     if(products.isEmpty()) {
-                        throw new NotFoundException();
+                        throw new NotFoundException("PRODUCT_NOT_FOUND");
                     }
                     return auth.fetchUserByToken(token);
                 })
                 .onItem().transformToUni(user -> database.fetchCart(user.getId())
-                        .onItem().ifNull().switchTo(() -> database.createCart(user.getId())
-                                .onItem().transformToUni(unused -> database.fetchCart(user.getId())))
-                        .onItem().call(cart -> database.addToCart(user.getId(), productId))
-                )
+                        .onFailure().recoverWithUni(throwable -> {
+                            if (throwable instanceof NotFoundException) {
+                                return database.createCart(user.getId())
+                                        .onItem().transformToUni(unused -> database.fetchCart(user.getId()));
+                            }
+                            throw new RuntimeException(throwable.getMessage());
+                        }))
+                .onItem().call(cart -> database.addToCart(cart.getUserId(), productId))
+                .replaceWithVoid();
+    }
+
+    public Uni<Void> removeFromCart(String token, String cartItemId) {
+        return auth.fetchUserByToken(token)
+                .onItem().call(user -> database.deleteCartItem(cartItemId))
                 .replaceWithVoid();
     }
 
