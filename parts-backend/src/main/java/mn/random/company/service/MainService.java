@@ -10,6 +10,7 @@ import mn.random.company.exception.AuthException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 @ApplicationScoped
 public class MainService {
@@ -17,11 +18,14 @@ public class MainService {
     SQLService database;
     @Inject
     AuthService auth;
+    @Inject
+    FileUploadService fileUploadService;
 
     public Uni<Void> createProduct(JsonObject jsonObject) {
         String token = jsonObject.getString("token");
         return auth.fetchUserByToken(token)
                 .onItem().call(user -> {
+                    jsonObject.put("image", fileUploadService.getImage(jsonObject.getString("uuid")));
                     Product product = new Product(jsonObject, user.getId());
                     return database.createProduct(product);
                 })
@@ -124,5 +128,22 @@ public class MainService {
                 .onItem().call(cart -> database.createOrder(cart))
                 .onItem().call(cart -> database.emptyCart(cart.getCartId()))
                 .replaceWithVoid();
+    }
+
+    public Uni<JsonObject> fetchStats() {
+        AtomicReference<JsonObject> stats = new AtomicReference<>(new JsonObject());
+        return database.fetchUserCount()
+                .onItem().transformToUni(userCount -> {
+                    stats.set(stats.get().put("users", userCount));
+                    return database.fetchProductCount();
+                })
+                .onItem().transformToUni(productCount -> {
+                    stats.set(stats.get().put("products", productCount));
+                    return database.fetchOrderCount();
+                })
+                .onItem().invoke(orderCount -> {
+                    stats.set(stats.get().put("orders", orderCount));
+                })
+                .replaceWith(stats.get());
     }
 }

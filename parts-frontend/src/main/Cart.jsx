@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
-import { IdentityDropdown } from './components'
+import { FooterComponent, IdentityDropdown, TopBar } from './components'
 import axios from 'axios';
 import { InputNumber, List, Button, Divider, Typography, message } from 'antd';
 
@@ -113,17 +113,8 @@ function Cart() {
      }
 
   return (
-     <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          minHeight: '90vh',
-          padding: '10px',
-         }}
-     >
-          <div style={{display: 'flex', width: '100%', justifyContent: 'space-between'}}>
-               <Button href='/'>Буцах</Button>
-               <IdentityDropdown user={user} />
-          </div>
+     <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '100vh', justifyContent: 'space-between'}}>
+          <TopBar user={user}/>
           <List style={{marginTop: '10px', marginLeft: '10vw', width: '80vw'}} loading={isLoading} dataSource={cartItems?.cartItems} renderItem={(item) => {
                return (
                     <List.Item
@@ -146,6 +137,7 @@ function Cart() {
                     <Button type='primary' style={{float: 'right'}} onClick={createOrder}>Захиалах</Button>
                </List.Item>
           </List>
+          <FooterComponent />
     </div>
   )
 }

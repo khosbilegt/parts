@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
-import { IdentityDropdown } from './components'
+import { FooterComponent, IdentityDropdown, TopBar } from './components'
 import axios from 'axios';
 import { List, Button, Typography, Badge, Tag} from 'antd';
 
@@ -62,34 +62,28 @@ function Order() {
      }
 
   return (
-     <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          minHeight: '90vh',
-          padding: '10px',
-         }}
-     >
-          <div style={{display: 'flex', width: '100%', justifyContent: 'space-between'}}>
-               <Button href='/'>Буцах</Button>
-               <IdentityDropdown user={user} />
-          </div>
-          <List style={{marginTop: '10px', marginLeft: '10vw', width: '80vw'}} loading={isLoading} dataSource={orderItems?.orderItems} renderItem={(item) => {
+     <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '100vh', justifyContent: 'space-between'}}>
+          <TopBar user={user}/>
+          <List style={{marginTop: '10px', width: '80vw'}} loading={isLoading} dataSource={orderItems?.orderItems} renderItem={(item) => {
                const state = item?.state === 'DELIVERED' ? 'Хүргэгдсэн' : 'Баталгаажсан'
+               const date = item?.createDate.substring(0, 10)
+               const time = item?.createDate.substring(11)
                return (
-                    <List.Item
+                    <List.Item style={{borderBottom: '1px solid #1c1c1c1'}}
                          actions={[]}>
                          <List.Item.Meta
-                              description={"Захиалга үүссэн цаг: " + item?.createDate}
-                              title={<Typography>{item?.orderId}</Typography>}
+                              description={"Захиалга үүссэн цаг: " + date + "ны " + time}
+                              title={<Typography>Захиалгын дугаар №{item?.orderId}</Typography>}
                          />
                          <Typography>Барааны тоо: </Typography>
                          <Badge count={Math.max(item.items.length, 0)} style={{ backgroundColor: '#52c41a', marginLeft: '5px' }}/>
-                         <Typography style={{marginLeft: '5px', marginRight: '5px'}}>Төлөв: </Typography>
+                         <Typography style={{marginLeft: '15px', marginRight: '5px'}}>Төлөв: </Typography>
                          <Tag color='magenta'>{state}</Tag>
                     </List.Item>
                )
           }}>
           </List>
+          <FooterComponent />
     </div>
   )
 }

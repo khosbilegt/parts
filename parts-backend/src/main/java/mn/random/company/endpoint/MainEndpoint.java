@@ -4,14 +4,20 @@ import io.smallrye.mutiny.Uni;
 import io.vertx.core.json.JsonObject;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import mn.random.company.dto.FileUploadForm;
 import mn.random.company.dto.Pagination;
+import mn.random.company.service.FileUploadService;
 import mn.random.company.service.MainService;
+import org.jboss.resteasy.reactive.MultipartForm;
 
 @Path("/api")
 public class MainEndpoint {
     @Inject
     MainService service;
+    @Inject
+    FileUploadService fileUploadService;
 
 
     @GET
@@ -127,6 +133,29 @@ public class MainEndpoint {
     public Uni<Response> createOrder(@QueryParam("token") String token) {
         return service.createOrder(token)
                 .onItem().transform(orders -> Response.ok().entity(orders).build())
+                .onFailure().recoverWithItem(this::handleFailure);
+    }
+
+    @GET
+    @Path("/stats")
+    public Uni<Response> fetchStats() {
+        return service.fetchStats()
+                .onItem().transform(stats -> Response.ok().entity(stats).build())
+                .onFailure().recoverWithItem(this::handleFailure);
+    }
+
+    @POST
+    @Path("/image")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.TEXT_PLAIN)
+    public Uni<Response> uploadFile(FileUploadForm form) {
+        return Uni.createFrom().item(() -> {
+            String id = fileUploadService.processFile(form.file);
+            return Response.ok().entity(new JsonObject()
+                    .put("status", "SUCCESS")
+                    .put("id", id))
+                    .build();
+        })
                 .onFailure().recoverWithItem(this::handleFailure);
     }
 

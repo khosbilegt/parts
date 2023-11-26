@@ -501,4 +501,61 @@ public class SQLService {
             }
         });
     }
+
+    public Uni<Integer> fetchUserCount() {
+        return Uni.createFrom().voidItem().onItem().transform(unused -> {
+            String query = "SELECT COUNT(UserID) from Users";
+            int count = 0;
+            try (Connection connection = dataSource.getConnection()) {
+                try(PreparedStatement statement = connection.prepareStatement(query)) {
+                    try(ResultSet resultSet = statement.executeQuery()) {
+                        while(resultSet.next()) {
+                            count = resultSet.getInt(1);
+                        }
+                    }
+                }
+            } catch (SQLException e) {
+                LOG.infov(e, "SQL_Exception during Fetch User Count: {0}", e.getMessage());
+            }
+            return count;
+        });
+    }
+
+    public Uni<Integer> fetchProductCount() {
+        return Uni.createFrom().voidItem().onItem().transform(unused -> {
+            String query = "SELECT COUNT(ProductID) from Products";
+            int count = 0;
+            try (Connection connection = dataSource.getConnection()) {
+                try(PreparedStatement statement = connection.prepareStatement(query)) {
+                    try(ResultSet resultSet = statement.executeQuery()) {
+                        while(resultSet.next()) {
+                            count = resultSet.getInt(1);
+                        }
+                    }
+                }
+            } catch (SQLException e) {
+                LOG.infov(e, "SQL_Exception during Fetch User Count: {0}", e.getMessage());
+            }
+            return count;
+        });
+    }
+
+    public Uni<Integer> fetchOrderCount() {
+        return Uni.createFrom().voidItem().onItem().transform(unused -> {
+            String query = "SELECT COUNT(OrderID) from Orders";
+            int count = 0;
+            try (Connection connection = dataSource.getConnection()) {
+                try(PreparedStatement statement = connection.prepareStatement(query)) {
+                    try(ResultSet resultSet = statement.executeQuery()) {
+                        while(resultSet.next()) {
+                            count = resultSet.getInt(1);
+                        }
+                    }
+                }
+            } catch (SQLException e) {
+                LOG.infov(e, "SQL_Exception during Fetch User Count: {0}", e.getMessage());
+            }
+            return count;
+        });
+    }
 }

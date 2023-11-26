@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Menu } from 'antd'
 import { Logo } from '../../resources/images'
@@ -6,7 +5,6 @@ import { IdentityDropdown } from './';
 
 function TopBar(props) {
      const navigate = useNavigate()
-     const [user, setUser] = useState({})
   
      const menuItems = [
        {

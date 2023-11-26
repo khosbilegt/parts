@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
-import { ProductCard, TopBar } from './components';
+import { FooterComponent, ProductCard, TopBar } from './components';
 import { Input, Pagination, Typography, InputNumber, Button, Dropdown } from 'antd';
 import { IdentityDropdown } from './components';
 
@@ -155,6 +155,7 @@ function Browse() {
                </div>
           </div>
           <Pagination defaultCurrent={1} total={products?.size} style={{marginTop: '25px', width: '100vw', textAlign: 'center'}} onChange={setPage}/>
+          <FooterComponent />
     </div>
   )
 }
