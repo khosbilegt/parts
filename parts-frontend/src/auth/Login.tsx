@@ -3,6 +3,7 @@ import { Button, Form, Input, Spin, message } from 'antd';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './Auth.css';
+import { Logo } from '../resources/images';
 
 const Login = () => {
      const [isLoading, setLoading] = useState(false);
@@ -33,7 +34,7 @@ const Login = () => {
           .catch(error => {
                setLoading(false)
                if(error.response?.data?.message === 'EMAIL_OR_PASSWORD_INVALID') {
-                    message.error('Мэйл хаяг эсвэл пассворд буруу байна');
+                    message.error('Мэйл хаяг эсвэл нууц үг буруу байна');
                } else {
                     message.error("Системийн алдаа гарлаа.")
                }
@@ -46,11 +47,14 @@ const Login = () => {
               name="basic"
               labelCol={{ span: 8 }}
               wrapperCol={{ span: 16 }}
-              style={{maxWidth: '100vw'}}
+              style={{maxWidth: '100vw', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}
               initialValues={{ remember: true }}
               onFinish={onFinish}
               autoComplete="off"
             >
+               <Form.Item>
+                    <a href='/'><img src={Logo} style={{width: '250px'}}/></a>
+               </Form.Item>
                <Form.Item<FieldType> label="Цахим Хаяг" name="email" rules={[{ required: true, message: 'Please input your username!' }]}>
                     <Input size="large" placeholder='test@gmail.com'/>
                </Form.Item>
@@ -66,10 +70,7 @@ const Login = () => {
                     {
                          isLoading ? <Spin /> : <></>
                     }
-               </Form.Item>
-
-               <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-                    <Button href='/register'>Шинэ бүртгэл үүсгэх</Button>
+                    <Button href='/register' type='link' style={{marginTop: '15px'}}>Шинэ бүртгэл үүсгэх</Button>
                </Form.Item>
             </Form>
           </div>
