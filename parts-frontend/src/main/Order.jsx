@@ -63,7 +63,7 @@ function Order() {
 
   return (
      <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '100vh', justifyContent: 'space-between'}}>
-          <TopBar user={user}/>
+          <TopBar user={user} selected={'/orders'}/>
           <List style={{marginTop: '10px', width: '80vw'}} loading={isLoading} dataSource={orderItems?.orderItems} renderItem={(item) => {
                const state = item?.state === 'DELIVERED' ? 'Хүргэгдсэн' : 'Баталгаажсан'
                const date = item?.createDate.substring(0, 10)

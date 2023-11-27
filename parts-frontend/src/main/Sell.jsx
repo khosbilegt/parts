@@ -84,7 +84,7 @@ function Sell() {
 
      return (
           <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '100vh'}}>
-               <TopBar user={user}/>
+               <TopBar user={user} selected={'/sell'}/>
                <Form
                     layout="vertical"
                     style={{ width: '60vw', padding: '30px', boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)' }}

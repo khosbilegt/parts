@@ -153,7 +153,7 @@ function Cart() {
 
   return (
      <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '100vh', justifyContent: 'space-between'}}>
-          <TopBar user={user}/>
+          <TopBar user={user} selected={'/cart'}/>
           <List style={{marginTop: '10px', marginLeft: '10vw', width: '80vw'}} loading={isLoading} dataSource={cartItems?.cartItems} renderItem={(item, index) => {
                return (
                     <List.Item

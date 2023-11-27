@@ -33,13 +33,12 @@ function FooterComponent() {
           <h3>Холбоосууд</h3>
           <a href="/">Нүүр</a>
           <a href="/browse">Бараа</a>
-          <a href="/about">Бидний тухай</a>
+          <a href="/sell">Зарах</a>
         </section>
         <section className="flex-content padding_1x">
-          <h3>Бусад мэдээлэл</h3>
-          <a href="#">Ажлын байр</a>
-          <a href="#">Хамт олон</a>
-          <a href="#">Мэдээ</a>
+          <h3 style={{opacity: 0}}>T</h3>
+          <a href="/cart">Сагс</a>
+          <a href="/orders">Захиалгууд</a>
         </section>
         <section className="flex-content padding_1x">
           <h3>Мэдээлэл</h3>
@@ -58,7 +57,7 @@ function FooterComponent() {
       </div>
       <div className="flex">
         <section className="flex-content padding_1x">
-          <p>Copyright ©2023 All rights reserved || Parts.com </p>
+          <p>Copyright ©2023 All rights reserved || Redparts.com </p>
         </section>
         <section className="flex-content padding_1x">
           <a href="#"><i className="fa fa-facebook"></i></a>

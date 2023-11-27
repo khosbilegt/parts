@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
 import { FooterComponent, ProductCard, TopBar } from './components';
-import { Input, Pagination, Typography, InputNumber, Button, Dropdown } from 'antd';
+import { Input, Pagination, Typography, InputNumber, Button, Dropdown, Skeleton } from 'antd';
 
 function Browse() {
      const navigate = useNavigate();
@@ -14,6 +14,7 @@ function Browse() {
      const [searchContent, setSearchContent] = useState("")
      const [searchType, setSearchType] = useState("NAME")
      const [searchTypeVisible, setSearchTypeVisible] = useState("Нэрээр")
+     const [isLoading, setLoading] = useState(true)
 
      const validateToken = () => {
           const token = localStorage.getItem('parts-token');
@@ -46,6 +47,7 @@ function Browse() {
           .then(response => {
                if(response.status === 200) {
                     setProducts(response.data)
+                    setLoading(false)
                }
           });
      }
@@ -145,14 +147,16 @@ function Browse() {
                )}
                <Button onClick={fetchProductsWithArguments} type='primary'>Хайх</Button>
           </div>
-          <Typography style={{marginTop: '25px'}}>Нийт {products?.size} илэрц олдлоо</Typography>
-          <div style={{marginTop: '25px', display: 'flex', width: '95vw', marginLeft: '2.5vw'}}>
-               <div style={{display: 'flex', columnGap: '25px', width: '100%', justifyContent: 'center'}}>
-                    {products?.products?.map((product, index) => {
-                         return <ProductCard product={product} key={index} onAdded={fetchProductsWithArguments}/>
-                    })}
+          <Skeleton loading={isLoading} style={{marginTop: '25px', display: 'flex', width: '95vw', marginLeft: '2.5vw'}}>
+               <Typography style={{marginTop: '25px'}}>Нийт {products?.size} илэрц олдлоо</Typography>
+               <div style={{marginTop: '25px', display: 'flex', width: '95vw', marginLeft: '2.5vw'}}>
+                    <div style={{display: 'flex', columnGap: '25px', width: '100%', justifyContent: 'center'}}>
+                              {products?.products?.map((product, index) => {
+                                   return <ProductCard product={product} key={index} onAdded={fetchProductsWithArguments}/>
+                              })}
+                    </div>
                </div>
-          </div>
+          </Skeleton>
           <Pagination defaultCurrent={1} total={products?.size} style={{marginTop: '25px', width: '100vw', textAlign: 'center'}} onChange={setPage}/>
           <FooterComponent />
     </div>

@@ -16,9 +16,17 @@ function TopBar(props) {
          key: '/browse'
        },
        {
-         label: 'Бидний тухай',
-         key: '/about'
-       }
+        label: 'Зарах',
+        key: '/sell'
+      },
+       {
+         label: 'Сагс',
+         key: '/cart'
+       },
+       {
+        label: 'Захиалгууд',
+        key: '/orders'
+      }
      ]
 
      const navigateToPage = (key) => {

@@ -2,9 +2,8 @@ import { useEffect, useState } from "react";
 import axios from 'axios'
 import { TopBar, FooterComponent } from "./components";
 import { Car } from "../resources/images";
-import { Card, Typography, Carousel, Spin } from "antd";
+import { Card, Typography } from "antd";
 import { CarOutlined, CheckCircleOutlined, ArrowDownOutlined } from "@ant-design/icons";
-import './Carousel.css'
 const { Title, Text } = Typography;
 
 
