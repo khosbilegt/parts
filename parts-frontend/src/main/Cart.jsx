@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
-import { FooterComponent, IdentityDropdown, TopBar } from './components'
+import { FooterComponent, TopBar } from './components'
 import axios from 'axios';
-import { InputNumber, List, Button, Divider, Typography, message } from 'antd';
+import { InputNumber, List, Button, Divider, Typography, message, Avatar } from 'antd';
+import { Placehodler } from '../resources/images';
 
 function Cart() {
      const navigate = useNavigate();
@@ -10,6 +11,7 @@ function Cart() {
      const [isLoading, setLoading] = useState(true)
      const [cartItems, setCartItems] = useState({})
      const [totalCost, setTotalCost] = useState(0)
+     const [images, setImages] = useState([])
 
      useEffect(() => {
           validateToken()
@@ -52,7 +54,6 @@ function Cart() {
                     }
                     setCartItems(items)
                     setLoading(false)
-                    calcualteTotal()
                }
           })
           .catch(error => {
@@ -82,13 +83,51 @@ function Cart() {
           });
      }
 
+     const decodeImages = () => {
+          setImages([])
+          cartItems?.cartItems?.forEach((item) => {
+               if(item?.product?.image != null) {
+                    const decodedImage = atob(item.product?.image);
+      
+                    const uint8Array = new Uint8Array(decodedImage.length);
+                    for (let i = 0; i < decodedImage.length; i++) {
+                    uint8Array[i] = decodedImage.charCodeAt(i);
+                    }
+               
+                    const blob = new Blob([uint8Array], { type: 'image/jpeg' });
+               
+                    const blobUrl = URL.createObjectURL(blob);
+
+                    const image = {
+                         src: blobUrl
+                    }
+                    setImages((prevImages) => [...prevImages, image]);
+                    console.log(images)
+
+                    return () => URL.revokeObjectURL(blobUrl);
+               } else {
+                    const image = {
+                         src: Placehodler
+                    }
+                    setImages((prevImages) => [...prevImages, image]);
+                    console.log(images)
+                    return () => URL.revokeObjectURL(Placehodler);
+               }
+          })    
+     }
+
      const calcualteTotal = () => {
           var total = 0
-          cartItems.cartItems.forEach((item) => {
+          cartItems?.cartItems?.forEach((item) => {
                total += item?.quantity * item?.product.price
           })
           setTotalCost(total)
      }
+
+     useEffect(() => {
+          calcualteTotal()
+          decodeImages()
+     }, [cartItems])
 
      const createOrder = () => {
           const token = localStorage.getItem('parts-token');
@@ -115,12 +154,14 @@ function Cart() {
   return (
      <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '100vh', justifyContent: 'space-between'}}>
           <TopBar user={user}/>
-          <List style={{marginTop: '10px', marginLeft: '10vw', width: '80vw'}} loading={isLoading} dataSource={cartItems?.cartItems} renderItem={(item) => {
+          <List style={{marginTop: '10px', marginLeft: '10vw', width: '80vw'}} loading={isLoading} dataSource={cartItems?.cartItems} renderItem={(item, index) => {
                return (
                     <List.Item
+                         style={{alignItems: 'center', justifyContent: 'center', display: 'flex'}}
                          actions={[<Button key="delete" type='default' onClick={e => removeFromCart(item?.cartItemId)}>Устгах</Button>]}>
                          <List.Item.Meta
                               title={<Typography>{item?.product?.productName}</Typography>}
+                              avatar={<Avatar src={images[index]?.src} size={75}/>}
                               description={item?.product?.description}
                          />
                          <div style={{display: 'flex'}}>

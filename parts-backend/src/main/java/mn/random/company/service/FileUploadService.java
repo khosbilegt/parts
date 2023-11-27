@@ -20,7 +20,9 @@ public class FileUploadService {
 
     public String getImage(String uuid) {
         if(IMAGES.containsKey(uuid)) {
-            return IMAGES.get(uuid);
+            String image = IMAGES.get(uuid);
+            IMAGES.remove(uuid);
+            return image;
         }
         return null;
     }

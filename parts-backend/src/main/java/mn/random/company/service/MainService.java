@@ -90,6 +90,7 @@ public class MainService {
                 })
                 .onItem().transformToUni(user -> database.fetchCart(user.getId()))
                 .onItem().call(cart -> database.addToCart(cart.getCartId(), productId))
+                .onItem().call(unused -> database.decrementProduct(productId))
                 .replaceWithVoid();
     }
 

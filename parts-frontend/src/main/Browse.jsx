@@ -3,7 +3,6 @@ import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
 import { FooterComponent, ProductCard, TopBar } from './components';
 import { Input, Pagination, Typography, InputNumber, Button, Dropdown } from 'antd';
-import { IdentityDropdown } from './components';
 
 function Browse() {
      const navigate = useNavigate();
@@ -150,7 +149,7 @@ function Browse() {
           <div style={{marginTop: '25px', display: 'flex', width: '95vw', marginLeft: '2.5vw'}}>
                <div style={{display: 'flex', columnGap: '25px', width: '100%', justifyContent: 'center'}}>
                     {products?.products?.map((product, index) => {
-                         return <ProductCard product={product} key={index}/>
+                         return <ProductCard product={product} key={index} onAdded={fetchProductsWithArguments}/>
                     })}
                </div>
           </div>

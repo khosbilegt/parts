@@ -147,8 +147,9 @@ public class SQLService {
                     case "PRICE" -> query = "SELECT * FROM Products WHERE Price BETWEEN ? AND ?";
                     default -> query = "SELECT * FROM Products WHERE ProductId = ?";
                 }
+                query += " AND STOCK > 0";
             } else {
-                query = "SELECT * FROM Products";
+                query = "SELECT * FROM Products WHERE Stock > 0";
             }
             if (pagination != null) {
                 query += " LIMIT ? OFFSET ?";
@@ -221,6 +222,26 @@ public class SQLService {
                     statement.setInt(6, product.getPrice());
                     statement.setInt(7, product.getStock());
                     statement.setString(8, product.getImage());
+                    statement.executeUpdate();
+                } catch(SQLException e) {
+                    LOG.errorv(e, "SQL_Exception during Create Product (Insert): {0}", e.getMessage());
+                    throw new RuntimeException("PRODUCT_CREATION_FAILED");
+                }
+                connection.commit();
+            } catch (SQLException e) {
+                LOG.errorv(e, "SQL_Exception during Create Product (Connect): {0}", e.getMessage());
+                throw new RuntimeException("PRODUCT_CREATION_FAILED");
+            }
+        });
+    }
+
+    public Uni<Void> decrementProduct(String productId) {
+        return Uni.createFrom().voidItem().invoke(unused -> {
+            try(Connection connection = dataSource.getConnection()) {
+                connection.setAutoCommit(false);
+                String query = "UPDATE Products SET Stock = Stock - 1 WHERE ProductID = ?";
+                try(PreparedStatement statement = connection.prepareStatement(query)) {
+                    statement.setString(1, productId);
                     statement.executeUpdate();
                 } catch(SQLException e) {
                     LOG.errorv(e, "SQL_Exception during Create Product (Insert): {0}", e.getMessage());

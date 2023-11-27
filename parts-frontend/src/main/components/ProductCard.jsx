@@ -1,9 +1,10 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { Card, Button, message } from 'antd'
 import Typography from 'antd/es/typography/Typography'
 import { Placehodler } from '../../resources/images';
 import { useState, useEffect } from 'react';
+import { ShoppingCartOutlined } from '@ant-design/icons';
 
 function ProductCard(props) {
   const navigate = useNavigate();
@@ -20,6 +21,7 @@ function ProductCard(props) {
     .then(response => {
           if(response.status === 200) {
             message.success("Сагсанд амжилттай нэмэгдлээ")
+            props?.onAdded()
           }
     })
     .catch(error => {
@@ -30,25 +32,19 @@ function ProductCard(props) {
   }
 
   useEffect(() => {
-    // Decode the Base64 string
     const decodedImage = atob(props.product?.image);
 
-    // Create a Uint8Array from the decoded string
     const uint8Array = new Uint8Array(decodedImage.length);
     for (let i = 0; i < decodedImage.length; i++) {
       uint8Array[i] = decodedImage.charCodeAt(i);
     }
 
-    // Create a Blob from the Uint8Array
     const blob = new Blob([uint8Array], { type: 'image/jpeg' });
 
-    // Create a data URL from the Blob
     const blobUrl = URL.createObjectURL(blob);
 
-    // Set the data URL as the image source
     setImageSrc(blobUrl);
 
-    // Clean up the URL when the component unmounts
     return () => URL.revokeObjectURL(blobUrl);
   }, []);
 
@@ -65,7 +61,7 @@ function ProductCard(props) {
       <Typography><span style={{fontWeight: 'bold'}}>Төрөл:</span> {props.product.category}</Typography>
       <Typography><span style={{fontWeight: 'bold'}}>Үнэ:</span> {props.product.price}</Typography>
       <Typography><span style={{fontWeight: 'bold'}}>Үлдэгдэл:</span> {props.product.stock}</Typography>
-      <Button style={{marginTop: '10px'}} onClick={addToCart}>Сагсанд нэмэх</Button>
+      <Button icon={<ShoppingCartOutlined />} style={{marginTop: '10px'}} onClick={addToCart}>Сагсанд нэмэх</Button>
     </Card>
   )
 }

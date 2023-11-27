@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { FooterComponent, IdentityDropdown, TopBar } from './components'
 import axios from 'axios';
-import { List, Button, Typography, Badge, Tag} from 'antd';
+import { List, Button, Typography, Badge, Tag, Avatar} from 'antd';
 
 function Order() {
      const navigate = useNavigate();
@@ -73,6 +73,7 @@ function Order() {
                          actions={[]}>
                          <List.Item.Meta
                               description={"Захиалга үүссэн цаг: " + date + "ны " + time}
+                              avatar={<Avatar size={50} src={item?.product?.image}/>}
                               title={<Typography>Захиалгын дугаар №{item?.orderId}</Typography>}
                          />
                          <Typography>Барааны тоо: </Typography>
