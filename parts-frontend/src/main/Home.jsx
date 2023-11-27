@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from 'axios'
-import { TopBar, FooterComponent } from "./components";
-import { Car } from "../resources/images";
+import { TopBar, FooterComponent, BrandCarousel } from "./components";
 import { Card, Typography } from "antd";
 import { CarOutlined, CheckCircleOutlined, ArrowDownOutlined } from "@ant-design/icons";
 const { Title, Text } = Typography;
@@ -48,7 +47,7 @@ function Home() {
         <Title style={{fontFamily: "'Roboto', sans-serif"}}>СЭЛБЭГИЙН ОНЛАЙН ЗАХ</Title>
         <Text type='secondary'>Монголын иргэн бүрт машины сэлбэг худалдаалах хялбар шийдлийг хүргэх бол бидний зорилго юм.</Text>
       </Typography>
-      <img src={Car} style={{width: '50vw'}}/>
+      <BrandCarousel />
       <Card title="Бидний давуу талууд" style={{textAlign: 'center', boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)' }}>
         <Card.Grid style={gridStyle}>
           <CarOutlined style={{fontSize: '25px'}}/>
