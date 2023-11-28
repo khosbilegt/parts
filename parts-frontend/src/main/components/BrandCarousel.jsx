@@ -80,7 +80,7 @@ function BrandCarousel() {
     }
   `;
 
-  const defaultURL = '/browse?type=MANUFACTURER&parameter=';
+  const defaultURL = '/browse?type=';
 
   const brandArrays = [
     [

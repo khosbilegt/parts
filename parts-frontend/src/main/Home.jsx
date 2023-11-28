@@ -9,15 +9,6 @@ const { Title, Text } = Typography;
 function Home() {
   const [user, setUser] = useState({})
 
-  const gridStyle = {
-    width: '33.3%',
-    textAlign: 'center',
-    justifyContent: 'center',
-    alignItems: 'center',
-    display: 'flex', 
-    columnGap: '10px'
-  };
-
   const validateToken = () => {
     const token = localStorage.getItem('parts-token');
     const url = "http://5.161.118.247:8089/api/auth?token=" + token;

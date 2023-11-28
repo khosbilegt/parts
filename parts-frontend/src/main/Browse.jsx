@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { FooterComponent, ProductCard, TopBar } from './components';
 import { Input, Pagination, Typography, InputNumber, Button, Dropdown, Skeleton } from 'antd';
 
 function Browse() {
      const navigate = useNavigate();
+     const location = useLocation()
      const [user, setUser] = useState({})
      const [products, setProducts] = useState({})
      const [page, setPage] = useState(1)
@@ -27,7 +28,16 @@ function Browse() {
           .then(response => {
                if(response.status === 200) {
                     setUser(response.data.user);
-                    fetchProducts();
+                    if(location?.search?.length > 0) {
+                         const params = new URLSearchParams(location?.search);
+                         const type = params.get("type");
+                         const parameter = params.get("parameter");
+                         setSearchType(type)
+                         setSearchContent(parameter)
+                         fetchProductsWithArgumentsFromValidation(type, parameter)
+                    } else {
+                         fetchProducts();
+                    }
                }
           })
           .catch(error => {
@@ -52,6 +62,26 @@ function Browse() {
           });
      }
 
+     const fetchProductsWithArgumentsFromValidation = (type, parameter) => {
+          if(searchType.length === 0) {
+               fetchProducts();
+          } else {
+               const pageOffset = (page - 1) * 12;
+               var url = "http://5.161.118.247:8089/api/product/browse?type=" + type + "&parameter=" + parameter + "&pageSize=10&pageOffset=" + pageOffset;
+               axios.get(url, {
+                    headers: {
+                         'Content-Type': 'application/json',
+                    }
+               })
+               .then(response => {
+                    if(response.status === 200) {
+                         setProducts(response.data)
+                         setLoading(false)
+                    }
+               });
+          }
+     }
+
      const fetchProductsWithArguments = () => {
           if(searchType.length === 0) {
                fetchProducts();
@@ -71,6 +101,7 @@ function Browse() {
                .then(response => {
                     if(response.status === 200) {
                          setProducts(response.data)
+                         setLoading(false)
                     }
                });
           }
